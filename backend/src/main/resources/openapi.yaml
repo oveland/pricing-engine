@@ -1,0 +1,117 @@
+openapi: 3.0.3
+info:
+  title: Pricing Service API
+  description: API para consulta de precios aplicables por producto, marca y fecha
+  version: 1.0.0
+
+paths:
+  /api/prices:
+    get:
+      summary: Buscar precio aplicable
+      description: Retorna el precio aplicable para un producto de una marca en una fecha dada, resolviendo por prioridad cuando hay solapamiento.
+      operationId: findApplicablePrice
+      parameters:
+        - name: date
+          in: query
+          required: true
+          description: Fecha de aplicación en formato ISO 8601
+          schema:
+            type: string
+            format: date-time
+            example: "2020-06-14T10:00:00"
+        - name: productId
+          in: query
+          required: true
+          description: Identificador del producto
+          schema:
+            type: integer
+            format: int64
+            example: 35455
+        - name: brandId
+          in: query
+          required: true
+          description: Identificador de la marca
+          schema:
+            type: integer
+            format: int64
+            example: 1
+      responses:
+        '200':
+          description: Precio aplicable encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceResponse'
+        '400':
+          description: Parámetros de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No se encontró precio aplicable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    PriceResponse:
+      type: object
+      required:
+        - productId
+        - brandId
+        - priceList
+        - startDate
+        - endDate
+        - price
+        - currency
+      properties:
+        productId:
+          type: integer
+          format: int64
+          example: 35455
+        brandId:
+          type: integer
+          format: int64
+          example: 1
+        priceList:
+          type: integer
+          example: 1
+        startDate:
+          type: string
+          format: date-time
+          example: "2020-06-14T00:00:00"
+        endDate:
+          type: string
+          format: date-time
+          example: "2020-12-31T23:59:59"
+        price:
+          type: number
+          format: decimal
+          example: 35.50
+        currency:
+          type: string
+          example: "EUR"
+
+    ErrorResponse:
+      type: object
+      required:
+        - status
+        - error
+        - message
+        - timestamp
+      properties:
+        status:
+          type: integer
+          example: 404
+        error:
+          type: string
+          example: "Not Found"
+        message:
+          type: string
+          example: "No applicable price found for brandId=1, productId=35455 at 2020-06-14T10:00:00"
+        timestamp:
+          type: string
+          format: date-time
