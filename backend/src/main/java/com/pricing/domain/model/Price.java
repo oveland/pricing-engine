@@ -25,17 +25,18 @@ public class Price {
 
     
     public boolean isApplicableAt(LocalDateTime date) {
-        return false;
+        return dateRange.contains(date);
     }
 
     
     public boolean hasHigherPriorityThan(Price other) {
-        return false;
+        return this.priority > other.priority;
     }
 
     
     public static Optional<Price> withHighestPriority(List<Price> prices) {
-        return Optional.empty();
+        return prices.stream()
+                .max(Comparator.comparingInt(Price::getPriority));
     }
 
     public BrandId getBrandId() {
