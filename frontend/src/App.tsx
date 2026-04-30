@@ -215,9 +215,7 @@ function App() {
             >
               <div className="bg-red-50 border-b border-red-200 px-6 py-3">
                 <h2 className="text-sm font-semibold text-red-800">
-                  {state.error.status === 404
-                    ? 'Precio no encontrado'
-                    : 'Parámetros inválidos'}
+                  {state.error.status === 404 ? 'Precio no encontrado' : 'Parámetros inválidos'}
                 </h2>
               </div>
               <div className="p-6">
