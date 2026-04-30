@@ -1,0 +1,31 @@
+.price-result {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden;
+
+  &__header {
+    @apply bg-green-50 border-b border-green-200 px-6 py-3;
+  }
+
+  &__title {
+    @apply text-sm font-semibold text-green-800;
+  }
+
+  &__body {
+    @apply p-6;
+  }
+
+  &__grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4;
+  }
+
+  &__label {
+    @apply text-sm font-medium text-gray-500;
+  }
+
+  &__value {
+    @apply mt-0.5 text-sm text-gray-900;
+
+    &--highlight {
+      @apply text-lg font-semibold;
+    }
+  }
+}

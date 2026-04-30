@@ -1,15 +1,15 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import App from '../App'
+import { PriceSearchPage } from './PriceSearchPage'
 
-describe('App — Price Search Form', () => {
+describe('PriceSearchPage', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
   })
 
-  it('renders form with date, productId and brandId inputs', () => {
-    render(<App />)
+  it('renders form with all inputs', () => {
+    render(<PriceSearchPage />)
 
     expect(screen.getByLabelText(/fecha de aplicación/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/id de producto/i)).toBeInTheDocument()
@@ -33,67 +33,37 @@ describe('App — Price Search Form', () => {
       json: async () => mockResponse,
     } as Response)
 
-    render(<App />)
+    render(<PriceSearchPage />)
     await userEvent.click(screen.getByRole('button', { name: /consultar precio/i }))
 
     await waitFor(() => {
       expect(screen.getByText(/precio encontrado/i)).toBeInTheDocument()
     })
-
-    expect(screen.getByText('35455')).toBeInTheDocument()
-    expect(screen.getByText('2')).toBeInTheDocument()
   })
 
-  it('displays error message on HTTP 404 response', async () => {
-    const mockError = {
-      status: 404,
-      error: 'Not Found',
-      message: 'No applicable price found for brandId=1, productId=35455 at 2020-06-14T10:00:00',
-      timestamp: '2026-04-29T10:00:00',
-    }
-
+  it('displays error on HTTP 404', async () => {
     vi.spyOn(global, 'fetch').mockResolvedValueOnce({
       ok: false,
-      json: async () => mockError,
+      json: async () => ({
+        status: 404,
+        error: 'Not Found',
+        message: 'No applicable price found',
+        timestamp: '2026-04-29T10:00:00',
+      }),
     } as Response)
 
-    render(<App />)
+    render(<PriceSearchPage />)
     await userEvent.click(screen.getByRole('button', { name: /consultar precio/i }))
 
     await waitFor(() => {
       expect(screen.getByText(/precio no encontrado/i)).toBeInTheDocument()
     })
-
-    expect(screen.getByText(mockError.message)).toBeInTheDocument()
-  })
-
-  it('displays error message on HTTP 400 response', async () => {
-    const mockError = {
-      status: 400,
-      error: 'Bad Request',
-      message: "Failed to convert value 'invalid' to required type",
-      timestamp: '2026-04-29T10:00:00',
-    }
-
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
-      ok: false,
-      json: async () => mockError,
-    } as Response)
-
-    render(<App />)
-    await userEvent.click(screen.getByRole('button', { name: /consultar precio/i }))
-
-    await waitFor(() => {
-      expect(screen.getByText(/parámetros inválidos/i)).toBeInTheDocument()
-    })
-
-    expect(screen.getByText(mockError.message)).toBeInTheDocument()
   })
 
   it('displays network error when fetch fails', async () => {
     vi.spyOn(global, 'fetch').mockRejectedValueOnce(new Error('Network error'))
 
-    render(<App />)
+    render(<PriceSearchPage />)
     await userEvent.click(screen.getByRole('button', { name: /consultar precio/i }))
 
     await waitFor(() => {

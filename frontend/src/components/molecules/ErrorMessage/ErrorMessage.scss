@@ -1,0 +1,19 @@
+.error-message {
+  @apply bg-white rounded-lg shadow-sm border border-red-200 overflow-hidden;
+
+  &__header {
+    @apply bg-red-50 border-b border-red-200 px-6 py-3;
+  }
+
+  &__title {
+    @apply text-sm font-semibold text-red-800;
+  }
+
+  &__body {
+    @apply p-6;
+  }
+
+  &__text {
+    @apply text-sm text-gray-700;
+  }
+}

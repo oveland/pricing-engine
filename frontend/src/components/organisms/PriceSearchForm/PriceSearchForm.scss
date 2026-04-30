@@ -1,0 +1,15 @@
+.price-search-form {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+
+  &__title {
+    @apply text-lg font-semibold text-gray-900 mb-4;
+  }
+
+  &__fields {
+    @apply grid grid-cols-1 sm:grid-cols-3 gap-4;
+  }
+
+  &__actions {
+    @apply mt-6;
+  }
+}

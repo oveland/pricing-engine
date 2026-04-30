@@ -1,0 +1,13 @@
+.input {
+  &__label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+
+  &__field {
+    @apply w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm;
+
+    &:focus {
+      @apply outline-none border-blue-500 ring-1 ring-blue-500;
+    }
+  }
+}
