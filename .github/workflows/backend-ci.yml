@@ -1,11 +1,3 @@
-# =============================================================================
-# Backend CI Pipeline — Format, Build, Test, Coverage & Static Analysis
-# =============================================================================
-# Triggers on pushes and PRs that touch backend code.
-# Each quality gate runs as a separate job for clear pipeline visibility.
-# Maven cache is shared across jobs; compiled classes are passed via artifacts.
-# =============================================================================
-
 name: Backend CI
 
 on:
@@ -31,9 +23,6 @@ env:
   JAVA_DISTRIBUTION: 'temurin'
 
 jobs:
-  # ---------------------------------------------------------------------------
-  # Gate 1: Code Formatting (Spotless + Palantir)
-  # ---------------------------------------------------------------------------
   format:
     name: "\U0001F3A8 Format"
     runs-on: ubuntu-latest
@@ -41,106 +30,57 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           cache: maven
+      - run: mvn spotless:check -B
 
-      - name: Check code formatting
-        run: mvn spotless:check -B
-
-  # ---------------------------------------------------------------------------
-  # Gate 2: Compile & Package
-  # ---------------------------------------------------------------------------
-  compile:
-    name: "\U0001F6E0 Compile"
+  pmd:
+    name: "\U0001F50D PMD"
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: backend
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           cache: maven
+      - run: mvn pmd:pmd pmd:cpd -B
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-pmd-report
+          path: |
+            backend/target/pmd.xml
+            backend/target/cpd.xml
+          retention-days: 30
 
-      - name: Compile and package (skip tests)
-        run: mvn package -B -DskipTests
-
-      - name: Upload compiled classes
-        uses: actions/upload-artifact@v4
+  compile:
+    name: "\U00002699 Compile"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: maven
+      - run: mvn compile -B
+      - uses: actions/upload-artifact@v4
         with:
           name: backend-compiled
           path: backend/target/
           retention-days: 1
 
-  # ---------------------------------------------------------------------------
-  # Gate 3: Unit & Integration Tests + Coverage
-  # ---------------------------------------------------------------------------
-  test:
-    name: "\U0001F9EA Tests"
-    runs-on: ubuntu-latest
-    needs: compile
-    defaults:
-      run:
-        working-directory: backend
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-          cache: maven
-
-      - name: Download compiled classes
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-compiled
-          path: backend/target/
-
-      - name: Run tests with coverage
-        run: mvn verify -B -Dmaven.main.skip=true
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-test-results
-          path: backend/target/surefire-reports/
-          retention-days: 30
-
-      - name: Upload JaCoCo coverage report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-coverage-report
-          path: backend/target/site/jacoco/
-          retention-days: 30
-
-      - name: Publish test results
-        if: always() && github.event_name == 'pull_request'
-        uses: dorny/test-reporter@v1
-        with:
-          name: Backend Test Results
-          path: backend/target/surefire-reports/*.xml
-          reporter: java-junit
-
-  # ---------------------------------------------------------------------------
-  # Gate 4: SpotBugs — Bug Detection
-  # ---------------------------------------------------------------------------
   spotbugs:
     name: "\U0001F41B SpotBugs"
     runs-on: ubuntu-latest
@@ -149,124 +89,97 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           cache: maven
-
-      - name: Download compiled classes
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: backend-compiled
           path: backend/target/
-
-      - name: Run SpotBugs analysis
-        run: mvn spotbugs:spotbugs -B
-
-      - name: Upload SpotBugs report
+      - run: mvn spotbugs:spotbugs -B
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: backend-spotbugs-report
           path: backend/target/spotbugs/
           retention-days: 30
 
-  # ---------------------------------------------------------------------------
-  # Gate 5: PMD — Code Smells & Complexity
-  # ---------------------------------------------------------------------------
-  pmd:
-    name: "\U0001F50D PMD"
+  test:
+    name: "\U0001F9EA Tests"
     runs-on: ubuntu-latest
-    needs: compile
+    needs: [format, pmd, spotbugs]
     defaults:
       run:
         working-directory: backend
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           cache: maven
-
-      - name: Download compiled classes
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: backend-compiled
           path: backend/target/
-
-      - name: Run PMD analysis
-        run: mvn pmd:pmd pmd:cpd -B
-
-      - name: Upload PMD report
+      - run: mvn verify -B -Dmaven.main.skip=true
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
-          name: backend-pmd-report
-          path: |
-            backend/target/pmd.xml
-            backend/target/cpd.xml
+          name: backend-test-results
+          path: backend/target/surefire-reports/
           retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage-report
+          path: backend/target/site/jacoco/
+          retention-days: 30
+      - uses: dorny/test-reporter@v1
+        if: always() && github.event_name == 'pull_request'
+        with:
+          name: Backend Test Results
+          path: backend/target/surefire-reports/*.xml
+          reporter: java-junit
 
-  # ---------------------------------------------------------------------------
-  # Gate 6: SonarCloud — Centralized Quality Dashboard
-  # ---------------------------------------------------------------------------
   sonar:
     name: "☁\uFE0F SonarCloud"
     runs-on: ubuntu-latest
-    needs: [test, spotbugs, pmd]
+    needs: test
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     defaults:
       run:
         working-directory: backend
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Set up JDK ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           cache: maven
-
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v4
+      - uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-
-      - name: Download coverage report
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: backend-coverage-report
           path: backend/target/site/jacoco/
-
-      - name: Download SpotBugs report
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: backend-spotbugs-report
           path: backend/target/spotbugs/
-
-      - name: Download PMD report
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: backend-pmd-report
           path: backend/target/
-
-      - name: Build and analyze with SonarCloud
-        env:
+      - env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: env.SONAR_TOKEN != ''
         run: >
@@ -278,3 +191,24 @@ jobs:
           -Dsonar.java.spotbugs.reportPaths=target/spotbugs/spotbugsXml.xml
           -Dsonar.java.pmd.reportPaths=target/pmd.xml
           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+
+  build:
+    name: "\U0001F4E6 Build"
+    runs-on: ubuntu-latest
+    needs: test
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: maven
+      - run: mvn package -B -DskipTests
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-jar
+          path: backend/target/*.jar
+          retention-days: 7
