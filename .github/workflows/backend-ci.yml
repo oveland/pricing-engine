@@ -148,6 +148,7 @@ jobs:
         run: >
           mvn clean verify sonar:sonar -B
           -Dsonar.projectKey=pricing-engine-backend
+          -Dsonar.projectName=pricing-engine-backend
           -Dsonar.organization=oveland
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.java.spotbugs.reportPaths=target/spotbugs/spotbugsXml.xml

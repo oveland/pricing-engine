@@ -14,7 +14,7 @@
     <groupId>com.pricing</groupId>
     <artifactId>pricing-service</artifactId>
     <version>1.0.0</version>
-    <name>pricing-service</name>
+    <name>pricing-engine-backend</name>
     <description>Pricing Service — REST API for applicable price lookup by product, brand and date</description>
 
     <properties>
