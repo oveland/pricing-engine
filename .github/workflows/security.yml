@@ -12,6 +12,7 @@ on:
     branches: [master, develop]
   pull_request:
     branches: [master, develop]
+  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
   schedule:
     # Run weekly on Mondays at 06:00 UTC to catch new CVEs
     - cron: '0 6 * * 1'

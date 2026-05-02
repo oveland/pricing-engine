@@ -18,6 +18,7 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 permissions:
   contents: read
