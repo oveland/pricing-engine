@@ -12,7 +12,6 @@ public record DateRange(LocalDateTime startDate, LocalDateTime endDate) {
         }
     }
 
-    
     public boolean contains(final LocalDateTime date) {
         return !date.isBefore(startDate) && !date.isAfter(endDate);
     }

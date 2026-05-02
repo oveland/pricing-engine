@@ -1,12 +1,11 @@
 package com.pricing.unit.domain.model;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.pricing.domain.model.Money;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class MoneyTest {
     @Test
@@ -44,32 +43,28 @@ class MoneyTest {
     @DisplayName("should throw IllegalArgumentException when amount is negative")
     void shouldThrowIllegalArgumentExceptionWhenAmountIsNegative() {
         BigDecimal negativeAmount = new BigDecimal("-1.00");
-        assertThrows(IllegalArgumentException.class,
-                () -> new Money(negativeAmount, "EUR"));
+        assertThrows(IllegalArgumentException.class, () -> new Money(negativeAmount, "EUR"));
     }
 
     @Test
     @DisplayName("should throw IllegalArgumentException when currency has less than 3 characters")
     void shouldThrowIllegalArgumentExceptionWhenCurrencyTooShort() {
         BigDecimal validAmount = new BigDecimal("10.00");
-        assertThrows(IllegalArgumentException.class,
-                () -> new Money(validAmount, "EU"));
+        assertThrows(IllegalArgumentException.class, () -> new Money(validAmount, "EU"));
     }
 
     @Test
     @DisplayName("should throw IllegalArgumentException when currency has more than 3 characters")
     void shouldThrowIllegalArgumentExceptionWhenCurrencyTooLong() {
         BigDecimal validAmount = new BigDecimal("10.00");
-        assertThrows(IllegalArgumentException.class,
-                () -> new Money(validAmount, "EURO"));
+        assertThrows(IllegalArgumentException.class, () -> new Money(validAmount, "EURO"));
     }
 
     @Test
     @DisplayName("should throw IllegalArgumentException when currency is empty")
     void shouldThrowIllegalArgumentExceptionWhenCurrencyIsEmpty() {
         BigDecimal validAmount = new BigDecimal("10.00");
-        assertThrows(IllegalArgumentException.class,
-                () -> new Money(validAmount, ""));
+        assertThrows(IllegalArgumentException.class, () -> new Money(validAmount, ""));
     }
 
     @Test

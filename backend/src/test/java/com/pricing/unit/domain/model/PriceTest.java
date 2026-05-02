@@ -1,16 +1,15 @@
 package com.pricing.unit.domain.model;
 
-import com.pricing.domain.model.*;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
+import com.pricing.domain.model.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class PriceTest {
     private static final BrandId BRAND_ZARA = new BrandId(1L);
@@ -36,9 +35,8 @@ class PriceTest {
     @Test
     @DisplayName("should create Price with different priority and money values")
     void shouldCreatePriceWithDifferentValues() {
-        DateRange shortRange = new DateRange(
-                LocalDateTime.of(2020, 6, 14, 15, 0, 0),
-                LocalDateTime.of(2020, 6, 14, 18, 30, 0));
+        DateRange shortRange =
+                new DateRange(LocalDateTime.of(2020, 6, 14, 15, 0, 0), LocalDateTime.of(2020, 6, 14, 18, 30, 0));
         Money otherPrice = new Money(new BigDecimal("25.45"), "EUR");
 
         Price price = new Price(BRAND_ZARA, PRODUCT_35455, 2, shortRange, 1, otherPrice);

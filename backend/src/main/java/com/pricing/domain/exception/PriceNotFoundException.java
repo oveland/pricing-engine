@@ -2,7 +2,6 @@ package com.pricing.domain.exception;
 
 import com.pricing.domain.model.BrandId;
 import com.pricing.domain.model.ProductId;
-
 import java.io.Serial;
 import java.time.LocalDateTime;
 

@@ -1,23 +1,22 @@
 package com.pricing.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.pricing.domain.model.BrandId;
 import com.pricing.domain.model.Price;
 import com.pricing.domain.model.ProductId;
 import com.pricing.infrastructure.adapter.output.jpa.JpaPriceAdapter;
 import com.pricing.infrastructure.adapter.output.jpa.SpringDataJpaRepository;
 import com.pricing.infrastructure.mapper.PriceMapper;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Import({JpaPriceAdapter.class, PriceMapper.class})
@@ -50,8 +49,7 @@ class JpaPriceAdapterIntegrationTest {
         void shouldReturnOnePriceAt10OnJune14() {
             LocalDateTime date = LocalDateTime.of(2020, 6, 14, 10, 0);
 
-            List<Price> prices = jpaPriceAdapter.findByBrandIdAndProductIdAndDate(
-                    BRAND_ZARA, PRODUCT_35455, date);
+            List<Price> prices = jpaPriceAdapter.findByBrandIdAndProductIdAndDate(BRAND_ZARA, PRODUCT_35455, date);
 
             assertThat(prices).hasSize(1);
             assertThat(prices.get(0).getPriceList()).isEqualTo(1);
@@ -62,13 +60,10 @@ class JpaPriceAdapterIntegrationTest {
         void shouldReturnTwoPricesAt16OnJune14() {
             LocalDateTime date = LocalDateTime.of(2020, 6, 14, 16, 0);
 
-            List<Price> prices = jpaPriceAdapter.findByBrandIdAndProductIdAndDate(
-                    BRAND_ZARA, PRODUCT_35455, date);
+            List<Price> prices = jpaPriceAdapter.findByBrandIdAndProductIdAndDate(BRAND_ZARA, PRODUCT_35455, date);
 
             assertThat(prices).hasSize(2);
-            assertThat(prices)
-                    .extracting(Price::getPriceList)
-                    .containsExactlyInAnyOrder(1, 2);
+            assertThat(prices).extracting(Price::getPriceList).containsExactlyInAnyOrder(1, 2);
         }
 
         @Test
@@ -76,13 +71,10 @@ class JpaPriceAdapterIntegrationTest {
         void shouldReturnTwoPricesAt10OnJune15() {
             LocalDateTime date = LocalDateTime.of(2020, 6, 15, 10, 0);
 
-            List<Price> prices = jpaPriceAdapter.findByBrandIdAndProductIdAndDate(
-                    BRAND_ZARA, PRODUCT_35455, date);
+            List<Price> prices = jpaPriceAdapter.findByBrandIdAndProductIdAndDate(BRAND_ZARA, PRODUCT_35455, date);
 
             assertThat(prices).hasSize(2);
-            assertThat(prices)
-                    .extracting(Price::getPriceList)
-                    .containsExactlyInAnyOrder(1, 3);
+            assertThat(prices).extracting(Price::getPriceList).containsExactlyInAnyOrder(1, 3);
         }
 
         @Test
@@ -90,8 +82,7 @@ class JpaPriceAdapterIntegrationTest {
         void shouldReturnEmptyListWhenNoMatches() {
             LocalDateTime date = LocalDateTime.of(2019, 1, 1, 0, 0);
 
-            List<Price> prices = jpaPriceAdapter.findByBrandIdAndProductIdAndDate(
-                    BRAND_ZARA, PRODUCT_35455, date);
+            List<Price> prices = jpaPriceAdapter.findByBrandIdAndProductIdAndDate(BRAND_ZARA, PRODUCT_35455, date);
 
             assertThat(prices).isEmpty();
         }
@@ -105,8 +96,7 @@ class JpaPriceAdapterIntegrationTest {
         void shouldMapEntityToDomainCorrectly() {
             LocalDateTime date = LocalDateTime.of(2020, 6, 14, 10, 0);
 
-            List<Price> prices = jpaPriceAdapter.findByBrandIdAndProductIdAndDate(
-                    BRAND_ZARA, PRODUCT_35455, date);
+            List<Price> prices = jpaPriceAdapter.findByBrandIdAndProductIdAndDate(BRAND_ZARA, PRODUCT_35455, date);
 
             assertThat(prices).hasSize(1);
             Price price = prices.get(0);

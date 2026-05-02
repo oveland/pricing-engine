@@ -13,8 +13,13 @@ public class Price {
     private final int priority;
     private final Money money;
 
-    public Price(final BrandId brandId, final ProductId productId, final int priceList,
-                 final DateRange dateRange, final int priority, final Money money) {
+    public Price(
+            final BrandId brandId,
+            final ProductId productId,
+            final int priceList,
+            final DateRange dateRange,
+            final int priority,
+            final Money money) {
         this.brandId = brandId;
         this.productId = productId;
         this.priceList = priceList;
@@ -32,8 +37,7 @@ public class Price {
     }
 
     public static Optional<Price> withHighestPriority(final List<Price> prices) {
-        return prices.stream()
-                .max(Comparator.comparingInt(Price::getPriority));
+        return prices.stream().max(Comparator.comparingInt(Price::getPriority));
     }
 
     public BrandId getBrandId() {

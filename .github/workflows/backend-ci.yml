@@ -54,6 +54,10 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           cache: maven
 
+      # --- Code Formatting ---
+      - name: Check code formatting (Spotless + Palantir)
+        run: mvn spotless:check -B
+
       # --- Build & Test ---
       - name: Build and run tests with coverage
         run: mvn clean verify -B

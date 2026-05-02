@@ -1,12 +1,11 @@
 package com.pricing.unit.domain.model;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.pricing.domain.model.DateRange;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class DateRangeTest {
     private static final LocalDateTime JUN_14_START = LocalDateTime.of(2020, 6, 14, 0, 0, 0);
