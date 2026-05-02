@@ -18,8 +18,8 @@ public class JpaPriceAdapter implements PriceRepositoryPort {
     private final PriceMapper priceMapper;
 
     @Override
-    public List<Price> findByBrandIdAndProductIdAndDate(BrandId brandId, ProductId productId, LocalDateTime date) {
-        List<PriceEntity> entities = jpaRepository.findByBrandIdAndProductIdAndDateBetween(
+    public List<Price> findByBrandIdAndProductIdAndDate(final BrandId brandId, final ProductId productId, final LocalDateTime date) {
+        final List<PriceEntity> entities = jpaRepository.findByBrandIdAndProductIdAndDateBetween(
                 brandId.value(), productId.value(), date);
         return entities.stream()
                 .map(priceMapper::toDomain)

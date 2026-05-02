@@ -13,8 +13,8 @@ public class Price {
     private final int priority;
     private final Money money;
 
-    public Price(BrandId brandId, ProductId productId, int priceList,
-                 DateRange dateRange, int priority, Money money) {
+    public Price(final BrandId brandId, final ProductId productId, final int priceList,
+                 final DateRange dateRange, final int priority, final Money money) {
         this.brandId = brandId;
         this.productId = productId;
         this.priceList = priceList;
@@ -23,18 +23,15 @@ public class Price {
         this.money = money;
     }
 
-    
-    public boolean isApplicableAt(LocalDateTime date) {
+    public boolean isApplicableAt(final LocalDateTime date) {
         return dateRange.contains(date);
     }
 
-    
-    public boolean hasHigherPriorityThan(Price other) {
+    public boolean hasHigherPriorityThan(final Price other) {
         return this.priority > other.priority;
     }
 
-    
-    public static Optional<Price> withHighestPriority(List<Price> prices) {
+    public static Optional<Price> withHighestPriority(final List<Price> prices) {
         return prices.stream()
                 .max(Comparator.comparingInt(Price::getPriority));
     }

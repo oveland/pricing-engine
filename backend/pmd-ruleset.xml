@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<ruleset name="Pricing Service Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0
+                             https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>
+        PMD ruleset for pricing-service. All rules enabled by default.
+        Only documented false-positive exclusions below.
+    </description>
+
+    <!-- Include full rulesets -->
+    <rule ref="category/java/bestpractices.xml"/>
+    <rule ref="category/java/errorprone.xml"/>
+    <rule ref="category/java/performance.xml"/>
+
+    <!-- codestyle: all rules, with tuned thresholds -->
+    <rule ref="category/java/codestyle.xml">
+        <exclude name="LongVariable"/>
+        <exclude name="ShortVariable"/>
+        <exclude name="AtLeastOneConstructor"/>
+    </rule>
+
+    <!-- LongVariable: raise threshold from 17 to 30 for Clean Architecture naming -->
+    <rule ref="category/java/codestyle.xml/LongVariable">
+        <properties>
+            <property name="minimum" value="30"/>
+        </properties>
+    </rule>
+
+    <!-- ShortVariable: allow id, ex, e — standard Java/JPA/exception conventions -->
+    <rule ref="category/java/codestyle.xml/ShortVariable">
+        <properties>
+            <property name="minimum" value="2"/>
+        </properties>
+    </rule>
+
+    <!-- AtLeastOneConstructor: exclude Spring-managed classes -->
+    <rule ref="category/java/codestyle.xml/AtLeastOneConstructor">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassDeclaration[pmd-java:hasAnnotation('org.springframework.context.annotation.Configuration')
+                             or pmd-java:hasAnnotation('org.springframework.web.bind.annotation.RestControllerAdvice')
+                             or pmd-java:hasAnnotation('org.springframework.boot.autoconfigure.SpringBootApplication')
+                             or pmd-java:hasAnnotation('org.springframework.stereotype.Component')]"/>
+        </properties>
+    </rule>
+
+    <!-- design: all rules, with scoped exclusions -->
+    <rule ref="category/java/design.xml">
+        <exclude name="LawOfDemeter"/>
+        <exclude name="UseUtilityClass"/>
+        <exclude name="LoosePackageCoupling"/> <!-- requires explicit package config; re-enable when needed -->
+    </rule>
+
+    <!-- LawOfDemeter: exclude mapper/converter classes (their job IS to traverse objects) -->
+    <rule ref="category/java/design.xml/LawOfDemeter">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassDeclaration[ends-with(@SimpleName, 'Mapper') or ends-with(@SimpleName, 'Converter')]"/>
+        </properties>
+    </rule>
+
+    <!-- UseUtilityClass: exclude Spring Boot main class -->
+    <rule ref="category/java/design.xml/UseUtilityClass">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassDeclaration[pmd-java:hasAnnotation('org.springframework.boot.autoconfigure.SpringBootApplication')]"/>
+        </properties>
+    </rule>
+
+</ruleset>

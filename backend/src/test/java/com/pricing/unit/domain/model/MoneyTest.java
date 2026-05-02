@@ -36,35 +36,40 @@ class MoneyTest {
     @Test
     @DisplayName("should throw NullPointerException when currency is null")
     void shouldThrowNullPointerExceptionWhenCurrencyIsNull() {
-        assertThrows(NullPointerException.class, () -> new Money(new BigDecimal("10.00"), null));
+        BigDecimal validAmount = new BigDecimal("10.00");
+        assertThrows(NullPointerException.class, () -> new Money(validAmount, null));
     }
 
     @Test
     @DisplayName("should throw IllegalArgumentException when amount is negative")
     void shouldThrowIllegalArgumentExceptionWhenAmountIsNegative() {
+        BigDecimal negativeAmount = new BigDecimal("-1.00");
         assertThrows(IllegalArgumentException.class,
-                () -> new Money(new BigDecimal("-1.00"), "EUR"));
+                () -> new Money(negativeAmount, "EUR"));
     }
 
     @Test
     @DisplayName("should throw IllegalArgumentException when currency has less than 3 characters")
     void shouldThrowIllegalArgumentExceptionWhenCurrencyTooShort() {
+        BigDecimal validAmount = new BigDecimal("10.00");
         assertThrows(IllegalArgumentException.class,
-                () -> new Money(new BigDecimal("10.00"), "EU"));
+                () -> new Money(validAmount, "EU"));
     }
 
     @Test
     @DisplayName("should throw IllegalArgumentException when currency has more than 3 characters")
     void shouldThrowIllegalArgumentExceptionWhenCurrencyTooLong() {
+        BigDecimal validAmount = new BigDecimal("10.00");
         assertThrows(IllegalArgumentException.class,
-                () -> new Money(new BigDecimal("10.00"), "EURO"));
+                () -> new Money(validAmount, "EURO"));
     }
 
     @Test
     @DisplayName("should throw IllegalArgumentException when currency is empty")
     void shouldThrowIllegalArgumentExceptionWhenCurrencyIsEmpty() {
+        BigDecimal validAmount = new BigDecimal("10.00");
         assertThrows(IllegalArgumentException.class,
-                () -> new Money(new BigDecimal("10.00"), ""));
+                () -> new Money(validAmount, ""));
     }
 
     @Test

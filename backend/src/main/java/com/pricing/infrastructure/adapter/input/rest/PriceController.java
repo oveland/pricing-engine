@@ -19,15 +19,15 @@ import java.time.LocalDateTime;
 @RequestMapping("/api/prices")
 @RequiredArgsConstructor
 public class PriceController {
-    private final FindApplicablePriceUseCase findApplicablePriceUseCase;
+    private final FindApplicablePriceUseCase priceUseCase;
     private final PriceMapper priceMapper;
 
     @GetMapping
     public ResponseEntity<PriceResponseDto> findApplicablePrice(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date,
-            @RequestParam Long productId,
-            @RequestParam Long brandId) {
-        Price price = findApplicablePriceUseCase.findApplicablePrice(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime date,
+            @RequestParam final Long productId,
+            @RequestParam final Long brandId) {
+        final Price price = priceUseCase.findApplicablePrice(
                 date, new ProductId(productId), new BrandId(brandId));
 
         return ResponseEntity.ok(priceMapper.toResponseDto(price));

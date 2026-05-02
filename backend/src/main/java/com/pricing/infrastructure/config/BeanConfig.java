@@ -8,8 +8,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class BeanConfig {
+
     @Bean
-    public FindApplicablePriceUseCase findApplicablePriceUseCase(PriceRepositoryPort priceRepository) {
+    public FindApplicablePriceUseCase findApplicablePriceUseCase(final PriceRepositoryPort priceRepository) {
         return new FindApplicablePriceUseCaseImpl(priceRepository);
     }
 }

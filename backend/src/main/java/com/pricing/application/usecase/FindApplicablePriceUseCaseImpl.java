@@ -13,13 +13,13 @@ import java.util.List;
 public class FindApplicablePriceUseCaseImpl implements FindApplicablePriceUseCase {
     private final PriceRepositoryPort priceRepository;
 
-    public FindApplicablePriceUseCaseImpl(PriceRepositoryPort priceRepository) {
+    public FindApplicablePriceUseCaseImpl(final PriceRepositoryPort priceRepository) {
         this.priceRepository = priceRepository;
     }
 
     @Override
-    public Price findApplicablePrice(LocalDateTime applicationDate, ProductId productId, BrandId brandId) {
-        List<Price> candidates = priceRepository.findByBrandIdAndProductIdAndDate(brandId, productId, applicationDate);
+    public Price findApplicablePrice(final LocalDateTime applicationDate, final ProductId productId, final BrandId brandId) {
+        final List<Price> candidates = priceRepository.findByBrandIdAndProductIdAndDate(brandId, productId, applicationDate);
 
         return Price.withHighestPriority(candidates)
                 .orElseThrow(() -> new PriceNotFoundException(brandId, productId, applicationDate));

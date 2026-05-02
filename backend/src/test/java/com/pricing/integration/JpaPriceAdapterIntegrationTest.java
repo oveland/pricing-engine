@@ -113,7 +113,7 @@ class JpaPriceAdapterIntegrationTest {
             assertThat(price.getBrandId()).isEqualTo(BRAND_ZARA);
             assertThat(price.getProductId()).isEqualTo(PRODUCT_35455);
             assertThat(price.getPriceList()).isEqualTo(1);
-            assertThat(price.getPriority()).isEqualTo(0);
+            assertThat(price.getPriority()).isZero();
             assertThat(price.getMoney().amount()).isEqualByComparingTo(new BigDecimal("35.50"));
             assertThat(price.getMoney().currency()).isEqualTo("EUR");
             assertThat(price.getDateRange().startDate()).isEqualTo(LocalDateTime.of(2020, 6, 14, 0, 0));

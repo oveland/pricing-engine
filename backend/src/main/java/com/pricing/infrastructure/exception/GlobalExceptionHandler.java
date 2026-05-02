@@ -14,9 +14,10 @@ import java.time.format.DateTimeFormatter;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     @ExceptionHandler(PriceNotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> handlePriceNotFound(PriceNotFoundException ex) {
-        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    public ResponseEntity<ErrorResponseDto> handlePriceNotFound(final PriceNotFoundException exception) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
     }
 
     @ExceptionHandler({
@@ -24,17 +25,17 @@ public class GlobalExceptionHandler {
         MissingServletRequestParameterException.class,
         IllegalArgumentException.class
     })
-    public ResponseEntity<ErrorResponseDto> handleBadRequest(Exception ex) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    public ResponseEntity<ErrorResponseDto> handleBadRequest(final Exception exception) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDto> handleGeneric(Exception ex) {
+    public ResponseEntity<ErrorResponseDto> handleGeneric(final Exception exception) {
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error");
     }
 
-    private ResponseEntity<ErrorResponseDto> buildErrorResponse(HttpStatus status, String message) {
-        ErrorResponseDto error = new ErrorResponseDto(
+    private ResponseEntity<ErrorResponseDto> buildErrorResponse(final HttpStatus status, final String message) {
+        final ErrorResponseDto error = new ErrorResponseDto(
             status.value(),
             status.getReasonPhrase(),
             message,

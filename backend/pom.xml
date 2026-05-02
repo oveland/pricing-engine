@@ -144,11 +144,7 @@
                 <configuration>
                     <targetJdk>${java.version}</targetJdk>
                     <rulesets>
-                        <ruleset>/category/java/bestpractices.xml</ruleset>
-                        <ruleset>/category/java/codestyle.xml</ruleset>
-                        <ruleset>/category/java/design.xml</ruleset>
-                        <ruleset>/category/java/errorprone.xml</ruleset>
-                        <ruleset>/category/java/performance.xml</ruleset>
+                        <ruleset>pmd-ruleset.xml</ruleset>
                     </rulesets>
                     <failOnViolation>false</failOnViolation>
                     <printFailingErrors>true</printFailingErrors>

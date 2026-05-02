@@ -13,8 +13,8 @@ import java.time.format.DateTimeFormatter;
 
 @Component
 public class PriceMapper {
-    
-    public Price toDomain(PriceEntity entity) {
+
+    public Price toDomain(final PriceEntity entity) {
         return new Price(
                 new BrandId(entity.getBrandId()),
                 new ProductId(entity.getProductId()),
@@ -25,16 +25,18 @@ public class PriceMapper {
         );
     }
 
-    
-    public PriceResponseDto toResponseDto(Price price) {
+    public PriceResponseDto toResponseDto(final Price price) {
+        final DateRange dateRange = price.getDateRange();
+        final Money money = price.getMoney();
+
         return new PriceResponseDto(
                 price.getProductId().value(),
                 price.getBrandId().value(),
                 price.getPriceList(),
-                price.getDateRange().startDate().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-                price.getDateRange().endDate().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-                price.getMoney().amount(),
-                price.getMoney().currency()
+                dateRange.startDate().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                dateRange.endDate().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                money.amount(),
+                money.currency()
         );
     }
 }
