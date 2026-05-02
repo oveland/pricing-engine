@@ -1,0 +1,154 @@
+# =============================================================================
+# Backend CI Pipeline — Build, Test, Coverage & Static Analysis
+# =============================================================================
+# Triggers on pushes and PRs that touch backend code.
+# Produces: test results, JaCoCo coverage, SpotBugs/PMD reports.
+# SonarCloud analysis runs as a separate step for centralized quality dashboard.
+# =============================================================================
+
+name: Backend CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+env:
+  JAVA_VERSION: '17'
+  JAVA_DISTRIBUTION: 'temurin'
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: Build, Test & Analyze
+  # ---------------------------------------------------------------------------
+  build-and-test:
+    name: Build, Test & Analyze
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history needed for SonarCloud blame analysis
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: maven
+
+      # --- Build & Test ---
+      - name: Build and run tests with coverage
+        run: mvn clean verify -B
+
+      # --- Static Analysis ---
+      - name: Run SpotBugs analysis
+        run: mvn spotbugs:spotbugs -B
+
+      - name: Run PMD analysis
+        run: mvn pmd:pmd pmd:cpd -B
+
+      # --- Upload Artifacts ---
+      - name: Upload JaCoCo coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: backend/target/site/jacoco/
+          retention-days: 30
+
+      - name: Upload SpotBugs report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-spotbugs-report
+          path: backend/target/spotbugs/
+          retention-days: 30
+
+      - name: Upload PMD report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-pmd-report
+          path: |
+            backend/target/pmd.xml
+            backend/target/cpd.xml
+          retention-days: 30
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: backend/target/surefire-reports/
+          retention-days: 30
+
+      # --- Test Report in PR ---
+      - name: Publish test results
+        if: always() && github.event_name == 'pull_request'
+        uses: dorny/test-reporter@v1
+        with:
+          name: Backend Test Results
+          path: backend/target/surefire-reports/*.xml
+          reporter: java-junit
+
+  # ---------------------------------------------------------------------------
+  # Job 2: SonarCloud Analysis (optional — requires SONAR_TOKEN secret)
+  # ---------------------------------------------------------------------------
+  sonar:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: maven
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Build and analyze with SonarCloud
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: env.SONAR_TOKEN != ''
+        run: >
+          mvn clean verify sonar:sonar -B
+          -Dsonar.projectKey=${{ github.repository_owner }}_pricing-service-backend
+          -Dsonar.organization=${{ github.repository_owner }}
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.java.spotbugs.reportPaths=target/spotbugs/spotbugsXml.xml
+          -Dsonar.java.pmd.reportPaths=target/pmd.xml
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
