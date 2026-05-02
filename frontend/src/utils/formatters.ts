@@ -18,7 +18,12 @@ export function formatPrice(amount: number, currency: string): string {
 }
 
 export function toIsoDateTime(dateTimeLocal: string): string {
-  return dateTimeLocal.includes('T') ? dateTimeLocal + ':00' : dateTimeLocal
+  if (!dateTimeLocal.includes('T')) return dateTimeLocal
+  // datetime-local gives "YYYY-MM-DDTHH:MM", we need "YYYY-MM-DDTHH:MM:SS"
+  // Only append seconds if not already present (avoid double ":00:00")
+  const timePart = dateTimeLocal.split('T')[1] ?? ''
+  const colonCount = (timePart.match(/:/g) ?? []).length
+  return colonCount < 2 ? dateTimeLocal + ':00' : dateTimeLocal
 }
 
 /**
