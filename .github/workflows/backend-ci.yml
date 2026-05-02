@@ -1,9 +1,9 @@
 # =============================================================================
-# Backend CI Pipeline — Build, Test, Coverage & Static Analysis
+# Backend CI Pipeline — Format, Build, Test, Coverage & Static Analysis
 # =============================================================================
 # Triggers on pushes and PRs that touch backend code.
-# Produces: test results, JaCoCo coverage, SpotBugs/PMD reports.
-# SonarCloud analysis runs as a separate step for centralized quality dashboard.
+# Each quality gate runs as a separate job for clear pipeline visibility.
+# Maven cache is shared across jobs; compiled classes are passed via artifacts.
 # =============================================================================
 
 name: Backend CI
@@ -19,7 +19,7 @@ on:
     paths:
       - 'backend/**'
       - '.github/workflows/backend-ci.yml'
-  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -32,20 +32,17 @@ env:
 
 jobs:
   # ---------------------------------------------------------------------------
-  # Job 1: Build, Test & Analyze
+  # Gate 1: Code Formatting (Spotless + Palantir)
   # ---------------------------------------------------------------------------
-  build-and-test:
-    name: Build, Test & Analyze
+  format:
+    name: "\U0001F3A8 Format"
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: backend
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Full history needed for SonarCloud blame analysis
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
@@ -54,22 +51,77 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           cache: maven
 
-      # --- Code Formatting ---
-      - name: Check code formatting (Spotless + Palantir)
+      - name: Check code formatting
         run: mvn spotless:check -B
 
-      # --- Build & Test ---
-      - name: Build and run tests with coverage
-        run: mvn clean verify -B
+  # ---------------------------------------------------------------------------
+  # Gate 2: Compile & Package
+  # ---------------------------------------------------------------------------
+  compile:
+    name: "\U0001F6E0 Compile"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      # --- Static Analysis ---
-      - name: Run SpotBugs analysis
-        run: mvn spotbugs:spotbugs -B
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: maven
 
-      - name: Run PMD analysis
-        run: mvn pmd:pmd pmd:cpd -B
+      - name: Compile and package (skip tests)
+        run: mvn package -B -DskipTests
 
-      # --- Upload Artifacts ---
+      - name: Upload compiled classes
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-compiled
+          path: backend/target/
+          retention-days: 1
+
+  # ---------------------------------------------------------------------------
+  # Gate 3: Unit & Integration Tests + Coverage
+  # ---------------------------------------------------------------------------
+  test:
+    name: "\U0001F9EA Tests"
+    runs-on: ubuntu-latest
+    needs: compile
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: maven
+
+      - name: Download compiled classes
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-compiled
+          path: backend/target/
+
+      - name: Run tests with coverage
+        run: mvn verify -B -Dmaven.main.skip=true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: backend/target/surefire-reports/
+          retention-days: 30
+
       - name: Upload JaCoCo coverage report
         if: always()
         uses: actions/upload-artifact@v4
@@ -78,6 +130,44 @@ jobs:
           path: backend/target/site/jacoco/
           retention-days: 30
 
+      - name: Publish test results
+        if: always() && github.event_name == 'pull_request'
+        uses: dorny/test-reporter@v1
+        with:
+          name: Backend Test Results
+          path: backend/target/surefire-reports/*.xml
+          reporter: java-junit
+
+  # ---------------------------------------------------------------------------
+  # Gate 4: SpotBugs — Bug Detection
+  # ---------------------------------------------------------------------------
+  spotbugs:
+    name: "\U0001F41B SpotBugs"
+    runs-on: ubuntu-latest
+    needs: compile
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: maven
+
+      - name: Download compiled classes
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-compiled
+          path: backend/target/
+
+      - name: Run SpotBugs analysis
+        run: mvn spotbugs:spotbugs -B
+
       - name: Upload SpotBugs report
         if: always()
         uses: actions/upload-artifact@v4
@@ -85,6 +175,36 @@ jobs:
           name: backend-spotbugs-report
           path: backend/target/spotbugs/
           retention-days: 30
+
+  # ---------------------------------------------------------------------------
+  # Gate 5: PMD — Code Smells & Complexity
+  # ---------------------------------------------------------------------------
+  pmd:
+    name: "\U0001F50D PMD"
+    runs-on: ubuntu-latest
+    needs: compile
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: maven
+
+      - name: Download compiled classes
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-compiled
+          path: backend/target/
+
+      - name: Run PMD analysis
+        run: mvn pmd:pmd pmd:cpd -B
 
       - name: Upload PMD report
         if: always()
@@ -96,35 +216,17 @@ jobs:
             backend/target/cpd.xml
           retention-days: 30
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-test-results
-          path: backend/target/surefire-reports/
-          retention-days: 30
-
-      # --- Test Report in PR ---
-      - name: Publish test results
-        if: always() && github.event_name == 'pull_request'
-        uses: dorny/test-reporter@v1
-        with:
-          name: Backend Test Results
-          path: backend/target/surefire-reports/*.xml
-          reporter: java-junit
-
   # ---------------------------------------------------------------------------
-  # Job 2: SonarCloud Analysis (optional — requires SONAR_TOKEN secret)
+  # Gate 6: SonarCloud — Centralized Quality Dashboard
   # ---------------------------------------------------------------------------
   sonar:
-    name: SonarCloud Analysis
+    name: "☁\uFE0F SonarCloud"
     runs-on: ubuntu-latest
-    needs: build-and-test
+    needs: [test, spotbugs, pmd]
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     defaults:
       run:
         working-directory: backend
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
