@@ -124,8 +124,8 @@ jobs:
         with:
           projectBaseDir: frontend
           args: >
-            -Dsonar.projectKey=${{ github.repository_owner }}_pricing-service-frontend
-            -Dsonar.organization=${{ github.repository_owner }}
+            -Dsonar.projectKey=pricing-engine-frontend
+            -Dsonar.organization=oveland
             -Dsonar.sources=src
             -Dsonar.exclusions=src/test/**,src/vite-env.d.ts
             -Dsonar.tests=src/test

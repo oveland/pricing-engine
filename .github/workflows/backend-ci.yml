@@ -146,8 +146,8 @@ jobs:
         if: env.SONAR_TOKEN != ''
         run: >
           mvn clean verify sonar:sonar -B
-          -Dsonar.projectKey=${{ github.repository_owner }}_pricing-service-backend
-          -Dsonar.organization=${{ github.repository_owner }}
+          -Dsonar.projectKey=pricing-engine-backend
+          -Dsonar.organization=oveland
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.java.spotbugs.reportPaths=target/spotbugs/spotbugsXml.xml
           -Dsonar.java.pmd.reportPaths=target/pmd.xml
