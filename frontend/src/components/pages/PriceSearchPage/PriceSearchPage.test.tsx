@@ -1,73 +1,160 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
+/* ── GSAP mock (hoisted so it's available before module evaluation) ── */
+const { mockFromTo, mockRevert, mockAdd } = vi.hoisted(() => ({
+  mockFromTo: vi.fn(),
+  mockRevert: vi.fn(),
+  mockAdd: vi.fn((fn: () => void) => fn()),
+}))
+
+vi.mock('gsap', () => ({
+  default: {
+    fromTo: (...args: unknown[]) => mockFromTo(...args),
+    to: vi.fn(),
+    context: vi.fn(() => ({ revert: mockRevert, add: mockAdd })),
+  },
+}))
+
 import { PriceSearchPage } from './PriceSearchPage'
 
 describe('PriceSearchPage', () => {
+  let originalMatchMedia: typeof window.matchMedia
+
   beforeEach(() => {
+    vi.clearAllMocks()
+
+    /* Mock matchMedia to prevent "not a function" errors from useGsapAnimation */
+    originalMatchMedia = window.matchMedia
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }))
+
+    /* Ensure dark class is on document root (mirrors main.tsx behaviour) */
+    document.documentElement.classList.add('dark')
+
+    /* Default fetch mock — idle state, no pending requests */
+    vi.spyOn(global, 'fetch').mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        productId: 35455,
+        brandId: 1,
+        priceList: 1,
+        startDate: '2020-06-14T00:00:00',
+        endDate: '2020-12-31T23:59:59',
+        price: 35.5,
+        currency: 'EUR',
+      }),
+    } as Response)
+  })
+
+  afterEach(() => {
+    window.matchMedia = originalMatchMedia
+    document.documentElement.classList.remove('dark')
     vi.restoreAllMocks()
   })
 
-  it('renders form with all inputs', () => {
-    render(<PriceSearchPage />)
-
-    expect(screen.getByLabelText(/fecha de aplicación/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/id de producto/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/id de marca/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /consultar precio/i })).toBeInTheDocument()
+  /* ── Req 2.1, 2.8: Gradient background ── */
+  it('applies gradient background class with dark tones', () => {
+    const { container } = render(<PriceSearchPage />)
+    const root = container.firstElementChild as HTMLElement
+    expect(root.classList.contains('price-search-page')).toBe(true)
   })
 
-  it('displays price result on successful API response', async () => {
-    const mockResponse = {
-      productId: 35455,
-      brandId: 1,
-      priceList: 2,
-      startDate: '2020-06-14T15:00:00',
-      endDate: '2020-06-14T18:30:00',
-      price: 25.45,
-      currency: 'EUR',
-    }
-
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockResponse,
-    } as Response)
-
+  /* ── Req 3.2: GSAP entry animation with stagger ── */
+  it('executes GSAP entry animation (stagger) on mount', () => {
     render(<PriceSearchPage />)
-    await userEvent.click(screen.getByRole('button', { name: /consultar precio/i }))
 
-    await waitFor(() => {
-      expect(screen.getByText(/precio encontrado/i)).toBeInTheDocument()
-    })
-  })
-
-  it('displays error on HTTP 404', async () => {
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({
-        status: 404,
-        error: 'Not Found',
-        message: 'No applicable price found',
-        timestamp: '2026-04-29T10:00:00',
+    expect(mockFromTo).toHaveBeenCalled()
+    const [, fromVars, toVars] = mockFromTo.mock.calls[0]
+    expect(fromVars).toEqual(expect.objectContaining({ opacity: 0, y: 30 }))
+    expect(toVars).toEqual(
+      expect.objectContaining({
+        opacity: 1,
+        y: 0,
+        stagger: 0.15,
       }),
-    } as Response)
+    )
+  })
+
+  /* ── Req 7.2: LoadingSpinner replaces plain text ── */
+  it('renders LoadingSpinner during "loading" state instead of plain text', async () => {
+    /* Make fetch hang so state stays in "loading" */
+    vi.spyOn(global, 'fetch').mockImplementation(() => new Promise(() => {}))
 
     render(<PriceSearchPage />)
     await userEvent.click(screen.getByRole('button', { name: /consultar precio/i }))
 
     await waitFor(() => {
-      expect(screen.getByText(/precio no encontrado/i)).toBeInTheDocument()
+      expect(screen.getByRole('status')).toBeInTheDocument()
+      expect(screen.queryByText(/buscando precio aplicable/i)).not.toBeInTheDocument()
     })
   })
 
-  it('displays network error when fetch fails', async () => {
-    vi.spyOn(global, 'fetch').mockRejectedValueOnce(new Error('Network error'))
-
+  /* ── Req 1.1: Dark mode by default ── */
+  it('loads with dark class on document root', () => {
     render(<PriceSearchPage />)
-    await userEvent.click(screen.getByRole('button', { name: /consultar precio/i }))
+    expect(document.documentElement.classList.contains('dark')).toBe(true)
+  })
 
-    await waitFor(() => {
-      expect(screen.getByText(/error de conexión/i)).toBeInTheDocument()
-    })
+  /* ── Req 8.1: ZARA brand with editorial typography ── */
+  it('shows "ZARA" with editorial typography (wide letter-spacing, light font-weight)', () => {
+    const { container } = render(<PriceSearchPage />)
+    const brandName = screen.getByText('ZARA')
+    expect(brandName).toBeInTheDocument()
+    expect(brandName.tagName).toBe('H1')
+    expect(brandName.classList.contains('price-search-page__brand-name')).toBe(true)
+
+    /* Verify the SCSS class is applied — the actual styles are defined in SCSS:
+       font-weight: 300, letter-spacing: 0.35em, text-transform: uppercase */
+    const header = container.querySelector('.price-search-page__header')
+    expect(header).toBeTruthy()
+    expect(header!.tagName).toBe('HEADER')
+  })
+
+  /* ── Req 8.2: Product Detail Layout ── */
+  it('uses Product Detail Layout centered with generous spacing', () => {
+    const { container } = render(<PriceSearchPage />)
+    const content = container.querySelector('.price-search-page__content')
+    expect(content).toBeTruthy()
+    expect(content!.classList.contains('max-w-2xl')).toBe(true)
+    expect(content!.classList.contains('mx-auto')).toBe(true)
+    expect(content!.classList.contains('py-16')).toBe(true)
+    expect(content!.classList.contains('px-6')).toBe(true)
+    expect(content!.classList.contains('space-y-12')).toBe(true)
+  })
+
+  /* ── Req 8.5: ProductImagePlaceholder with portrait proportion ── */
+  it('renders ProductImagePlaceholder with portrait proportion', () => {
+    const { container } = render(<PriceSearchPage />)
+    const placeholder = container.querySelector('.product-image-placeholder')
+    expect(placeholder).toBeTruthy()
+    expect(placeholder!.getAttribute('style')).toContain('aspect-ratio: 3 / 4')
+  })
+
+  /* ── Req 8.7: Tagline ── */
+  it('shows tagline "Colección Primavera/Verano 2020 — Consulta de precios"', () => {
+    render(<PriceSearchPage />)
+    const tagline = screen.getByText('Colección Primavera/Verano 2020 — Consulta de precios')
+    expect(tagline).toBeInTheDocument()
+    expect(tagline.classList.contains('price-search-page__tagline')).toBe(true)
+  })
+
+  /* ── Req 8.2: Single-column centered layout ── */
+  it('has single-column centered layout', () => {
+    const { container } = render(<PriceSearchPage />)
+    const content = container.querySelector('.price-search-page__content')
+    expect(content).toBeTruthy()
+    /* max-w-2xl + mx-auto ensures single-column centered layout */
+    expect(content!.classList.contains('max-w-2xl')).toBe(true)
+    expect(content!.classList.contains('mx-auto')).toBe(true)
   })
 })

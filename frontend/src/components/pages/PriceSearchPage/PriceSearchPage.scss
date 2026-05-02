@@ -1,35 +1,27 @@
 .price-search-page {
-  @apply min-h-screen bg-gray-50;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 30%, #16213e 60%, #1a1510 100%);
 
-  &__header {
-    @apply bg-white border-b border-gray-200;
+  &__brand-name {
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 300;
+    font-size: 2.5rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #f5f5f0;
   }
 
-  &__header-content {
-    @apply max-w-3xl mx-auto px-4 py-6;
-  }
-
-  &__title {
-    @apply text-2xl font-bold text-gray-900;
-  }
-
-  &__subtitle {
-    @apply mt-1 text-sm text-gray-600;
-  }
-
-  &__main {
-    @apply max-w-3xl mx-auto px-4 py-8;
-  }
-
-  &__results {
-    @apply mt-6;
-  }
-
-  &__loading {
-    @apply text-center text-sm text-gray-600 p-6 bg-white rounded-lg border border-gray-200;
+  &__tagline {
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 400;
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+    color: #a0998c;
+    margin-top: 0.5rem;
   }
 
   &__footer {
-    @apply max-w-3xl mx-auto px-4 py-6 text-center text-xs text-gray-400;
+    color: #6b6560;
+    font-size: 0.75rem;
   }
 }
