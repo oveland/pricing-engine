@@ -141,12 +141,30 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
+      - name: Download coverage report
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: backend/target/site/jacoco/
+
+      - name: Download SpotBugs report
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-spotbugs-report
+          path: backend/target/spotbugs/
+
+      - name: Download PMD report
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-pmd-report
+          path: backend/target/
+
       - name: Build and analyze with SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: env.SONAR_TOKEN != ''
         run: >
-          mvn clean verify sonar:sonar -B
+          mvn compile sonar:sonar -B -DskipTests
           -Dsonar.projectKey=pricing-engine-backend
           -Dsonar.projectName=pricing-engine-backend
           -Dsonar.organization=oveland
