@@ -1,0 +1,11 @@
+.product-image-placeholder {
+  @apply flex items-center justify-center overflow-hidden;
+
+  &__icon-wrapper {
+    @apply flex items-center justify-center;
+  }
+
+  &__icon {
+    @apply opacity-80;
+  }
+}
