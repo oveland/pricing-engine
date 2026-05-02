@@ -1,31 +1,51 @@
 .price-result {
-  @apply bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden;
+  @apply p-8 text-center;
 
-  &__header {
-    @apply bg-green-50 border-b border-green-200 px-6 py-3;
+  &__brand {
+    @apply block font-light text-sm uppercase tracking-[0.35em];
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    color: #a0998c;
   }
 
-  &__title {
-    @apply text-sm font-semibold text-green-800;
+  &__price-tag {
+    @apply mt-4 mb-4;
+    transition: opacity 0.3s ease, transform 0.3s ease;
   }
 
-  &__body {
-    @apply p-6;
+  &__price-integer {
+    @apply font-light;
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 3rem;
+    line-height: 1;
+    color: #f5f5f0;
   }
 
-  &__grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4;
+  &__price-decimal {
+    @apply font-light;
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 1.5rem;
+    vertical-align: super;
+    color: #f5f5f0;
   }
 
-  &__label {
-    @apply text-sm font-medium text-gray-500;
+  &__price-currency {
+    @apply font-light;
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 2rem;
+    color: #d4af37;
   }
 
-  &__value {
-    @apply mt-0.5 text-sm text-gray-900;
+  &__details {
+    @apply mt-4 flex flex-col gap-1;
+  }
 
-    &--highlight {
-      @apply text-lg font-semibold;
-    }
+  &__meta {
+    @apply text-sm;
+    color: #a0998c;
+  }
+
+  &__dates {
+    @apply text-sm;
+    color: #6b6560;
   }
 }

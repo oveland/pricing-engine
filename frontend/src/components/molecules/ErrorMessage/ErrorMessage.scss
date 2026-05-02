@@ -1,12 +1,14 @@
 .error-message {
-  @apply bg-white rounded-lg shadow-sm border border-red-200 overflow-hidden;
+  @apply overflow-hidden;
 
   &__header {
-    @apply bg-red-50 border-b border-red-200 px-6 py-3;
+    @apply px-6 py-3;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   &__title {
-    @apply text-sm font-semibold text-red-800;
+    @apply text-sm font-semibold;
+    color: #ef4444;
   }
 
   &__body {
@@ -14,6 +16,7 @@
   }
 
   &__text {
-    @apply text-sm text-gray-700;
+    @apply text-sm;
+    color: #a0998c;
   }
 }
