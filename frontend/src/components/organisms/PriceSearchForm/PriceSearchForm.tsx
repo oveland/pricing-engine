@@ -1,6 +1,8 @@
 import type { FormEvent } from 'react'
 import { Input } from '../../atoms/Input/Input'
 import { Button } from '../../atoms/Button/Button'
+import { TemporalSlider } from '../../atoms/TemporalSlider/TemporalSlider'
+import type { SliderMarker } from '../../../types/price.types'
 import './PriceSearchForm.scss'
 
 interface PriceSearchFormProps {
@@ -12,6 +14,12 @@ interface PriceSearchFormProps {
   onProductIdChange: (value: string) => void
   onBrandIdChange: (value: string) => void
   onSubmit: () => void
+  /** Valor del slider temporal como timestamp */
+  sliderValue: number
+  /** Callback al cambiar el slider */
+  onSliderChange: (timestamp: number) => void
+  /** Marcadores de transición de precios */
+  sliderMarkers: SliderMarker[]
 }
 
 export function PriceSearchForm({
@@ -23,6 +31,9 @@ export function PriceSearchForm({
   onProductIdChange,
   onBrandIdChange,
   onSubmit,
+  sliderValue,
+  onSliderChange,
+  sliderMarkers,
 }: PriceSearchFormProps) {
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -32,7 +43,7 @@ export function PriceSearchForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="price-search-form"
+      className="price-search-form glassmorphism"
       aria-label="Formulario de consulta de precios"
     >
       <h2 className="price-search-form__title">Parámetros de consulta</h2>
@@ -62,6 +73,14 @@ export function PriceSearchForm({
           onChange={onBrandIdChange}
           required
           min="1"
+        />
+      </div>
+      <div className="price-search-form__slider">
+        <TemporalSlider
+          value={sliderValue}
+          onChange={onSliderChange}
+          markers={sliderMarkers}
+          disabled={loading}
         />
       </div>
       <div className="price-search-form__actions">

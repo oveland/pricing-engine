@@ -5,8 +5,19 @@ import { ErrorMessage } from '../../molecules/ErrorMessage/ErrorMessage'
 import './PriceSearchPage.scss'
 
 export function PriceSearchPage() {
-  const { date, productId, brandId, state, setDate, setProductId, setBrandId, search } =
-    usePriceSearch()
+  const {
+    date,
+    productId,
+    brandId,
+    state,
+    setDate,
+    setProductId,
+    setBrandId,
+    search,
+    sliderValue,
+    setSliderValue,
+    sliderMarkers,
+  } = usePriceSearch()
 
   return (
     <div className="price-search-page">
@@ -29,6 +40,9 @@ export function PriceSearchPage() {
           onProductIdChange={setProductId}
           onBrandIdChange={setBrandId}
           onSubmit={search}
+          sliderValue={sliderValue}
+          onSliderChange={setSliderValue}
+          sliderMarkers={sliderMarkers}
         />
 
         <div className="price-search-page__results" aria-live="polite">
