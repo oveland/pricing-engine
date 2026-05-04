@@ -1,6 +1,10 @@
 import './TemporalSlider.scss'
 
-import { SLIDER_MIN_TIMESTAMP, SLIDER_MAX_TIMESTAMP, timestampToPercent } from '../../../utils/slider.utils'
+import {
+  SLIDER_MIN_TIMESTAMP,
+  SLIDER_MAX_TIMESTAMP,
+  timestampToPercent,
+} from '../../../utils/slider.utils'
 import { formatSliderDate } from '../../../utils/formatters'
 import type { SliderMarker } from '../../../types/price.types'
 
@@ -15,7 +19,12 @@ export interface TemporalSliderProps {
   disabled?: boolean
 }
 
-export function TemporalSlider({ value, onChange, markers, disabled = false }: TemporalSliderProps) {
+export function TemporalSlider({
+  value,
+  onChange,
+  markers,
+  disabled = false,
+}: TemporalSliderProps) {
   const readableDate = formatSliderDate(value)
 
   return (

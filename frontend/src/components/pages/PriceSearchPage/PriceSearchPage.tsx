@@ -6,7 +6,6 @@ import { PriceSearchForm } from '../../organisms/PriceSearchForm/PriceSearchForm
 import { PriceResult } from '../../molecules/PriceResult/PriceResult'
 import { ErrorMessage } from '../../molecules/ErrorMessage/ErrorMessage'
 import { LoadingSpinner } from '../../atoms/LoadingSpinner/LoadingSpinner'
-import { ProductImagePlaceholder } from '../../atoms/ProductImagePlaceholder/ProductImagePlaceholder'
 import './PriceSearchPage.scss'
 
 export function PriceSearchPage() {
@@ -44,18 +43,11 @@ export function PriceSearchPage() {
       <div className="price-search-page__content max-w-2xl mx-auto py-16 px-6 space-y-12">
         {/* BrandHeader — sección semántica con identidad de marca */}
         <header data-animate className="price-search-page__header text-center">
-          <h1 className="price-search-page__brand-name">ZARA</h1>
+          <h1 className="price-search-page__brand-name">MOTOR DE PRECIOS</h1>
           <p className="price-search-page__tagline">
             Colección Primavera/Verano 2020 — Consulta de precios
           </p>
         </header>
-
-        {/* ProductImagePlaceholder — visible cuando no hay resultado de precio */}
-        {state.kind !== 'success' && (
-          <div data-animate className="flex justify-center">
-            <ProductImagePlaceholder />
-          </div>
-        )}
 
         {/* PriceSearchForm con slider temporal */}
         <div data-animate>
@@ -80,9 +72,7 @@ export function PriceSearchPage() {
           {state.kind === 'success' && <PriceResult {...state.data} />}
           {state.kind === 'error' && (
             <ErrorMessage
-              title={
-                state.error.status === 404 ? 'Precio no encontrado' : 'Parámetros inválidos'
-              }
+              title={state.error.status === 404 ? 'Precio no encontrado' : 'Parámetros inválidos'}
               message={state.error.message}
             />
           )}

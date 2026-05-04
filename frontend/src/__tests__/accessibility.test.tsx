@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 /* ── GSAP mock (hoisted so it's available before module evaluation) ── */
@@ -98,9 +98,7 @@ describe('Accessibility — cross-cutting tests', () => {
       const form = container.querySelector('form')
       expect(form).toBeTruthy()
 
-      const interactiveElements = form!.querySelectorAll(
-        'input, button, [type="range"]',
-      )
+      const interactiveElements = form!.querySelectorAll('input, button, [type="range"]')
 
       // Extract the interactive elements in DOM order
       const elementTypes: string[] = []
@@ -147,8 +145,6 @@ describe('Accessibility — cross-cutting tests', () => {
   /* ── Req 6.2: Existing ARIA attributes maintained ── */
   describe('ARIA attributes maintained in refactored components', () => {
     it('PriceSearchForm has aria-label on the form element', () => {
-      const form = screen.queryByRole('form') ?? render(<PriceSearchPage />).container.querySelector('form')
-      // Re-render to ensure we get the form
       const { container } = render(<PriceSearchPage />)
       const formEl = container.querySelector('form[aria-label]')
       expect(formEl).toBeTruthy()

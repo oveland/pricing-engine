@@ -51,7 +51,7 @@ describe('ErrorMessage', () => {
           expect.objectContaining({ x: 10 }),
           expect.objectContaining({ x: 0 }),
         ]),
-      })
+      }),
     )
   })
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import type { QueryState, SliderMarker } from '../types/price.types'
 import { fetchApplicablePrice } from '../services/price.service'
 import { useDebounce } from './useDebounce'
@@ -18,8 +18,9 @@ export function usePriceSearch() {
   const [state, setState] = useState<QueryState>({ kind: 'idle' })
   const [sliderValue, setSliderValue] = useState(SLIDER_MIN_TIMESTAMP)
 
-  const debouncedSliderValue = useDebounce(sliderValue, 500)
+  const debouncedSliderValue = useDebounce(sliderValue, 200)
   const isInitialMount = useRef(true)
+  const shouldAutoSearch = useRef(false)
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -27,11 +28,44 @@ export function usePriceSearch() {
       return
     }
 
+    shouldAutoSearch.current = true
     setDate(timestampToDateTimeLocal(debouncedSliderValue) + ':00')
-    search()
   }, [debouncedSliderValue])
 
-  async function search() {
+  useEffect(() => {
+    if (!shouldAutoSearch.current) return
+    shouldAutoSearch.current = false
+
+    let cancelled = false
+
+    async function fetchPrice() {
+      setState({ kind: 'loading' })
+
+      try {
+        const result = await fetchApplicablePrice({ date, productId, brandId })
+
+        if (cancelled) return
+
+        if (result.ok) {
+          setState({ kind: 'success', data: result.data })
+        } else {
+          setState({ kind: 'error', error: result.error })
+        }
+      } catch {
+        if (!cancelled) {
+          setState({ kind: 'network-error', message: NETWORK_ERROR_MESSAGE })
+        }
+      }
+    }
+
+    fetchPrice()
+
+    return () => {
+      cancelled = true
+    }
+  }, [date, productId, brandId])
+
+  const search = useCallback(async () => {
     setState({ kind: 'loading' })
 
     try {
@@ -45,7 +79,7 @@ export function usePriceSearch() {
     } catch {
       setState({ kind: 'network-error', message: NETWORK_ERROR_MESSAGE })
     }
-  }
+  }, [date, productId, brandId])
 
   const sliderMarkers: SliderMarker[] = PRICE_TRANSITION_MARKERS
 

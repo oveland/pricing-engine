@@ -17,10 +17,9 @@ describe('useDebounce', () => {
   })
 
   it('retrasa actualización por el delay especificado', () => {
-    const { result, rerender } = renderHook(
-      ({ value, delay }) => useDebounce(value, delay),
-      { initialProps: { value: 'initial', delay: 300 } },
-    )
+    const { result, rerender } = renderHook(({ value, delay }) => useDebounce(value, delay), {
+      initialProps: { value: 'initial', delay: 300 },
+    })
 
     // Cambiar el valor
     rerender({ value: 'updated', delay: 300 })
@@ -39,10 +38,9 @@ describe('useDebounce', () => {
   })
 
   it('usa delay por defecto de 500ms', () => {
-    const { result, rerender } = renderHook(
-      ({ value }) => useDebounce(value),
-      { initialProps: { value: 'first' } },
-    )
+    const { result, rerender } = renderHook(({ value }) => useDebounce(value), {
+      initialProps: { value: 'first' },
+    })
 
     rerender({ value: 'second' })
 
@@ -60,10 +58,9 @@ describe('useDebounce', () => {
   })
 
   it('cancela actualizaciones pendientes ante nuevos cambios rápidos', () => {
-    const { result, rerender } = renderHook(
-      ({ value }) => useDebounce(value, 500),
-      { initialProps: { value: 'a' } },
-    )
+    const { result, rerender } = renderHook(({ value }) => useDebounce(value, 500), {
+      initialProps: { value: 'a' },
+    })
 
     // Cambio rápido 1
     rerender({ value: 'b' })

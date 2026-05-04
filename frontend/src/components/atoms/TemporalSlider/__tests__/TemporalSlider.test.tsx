@@ -1,7 +1,12 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { TemporalSlider } from '../TemporalSlider'
-import { SLIDER_MIN_TIMESTAMP, SLIDER_MAX_TIMESTAMP, PRICE_TRANSITION_MARKERS, timestampToPercent } from '../../../../utils/slider.utils'
+import {
+  SLIDER_MIN_TIMESTAMP,
+  SLIDER_MAX_TIMESTAMP,
+  PRICE_TRANSITION_MARKERS,
+  timestampToPercent,
+} from '../../../../utils/slider.utils'
 import { formatSliderDate } from '../../../../utils/formatters'
 
 const defaultProps = {

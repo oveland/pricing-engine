@@ -47,11 +47,11 @@ describe('usePriceSearch — slider integration', () => {
 
     // Before debounce completes, no search
     await act(async () => {
-      vi.advanceTimersByTime(499)
+      vi.advanceTimersByTime(199)
     })
     expect(mockFetch).not.toHaveBeenCalled()
 
-    // After debounce (500ms), search is triggered
+    // After debounce (200ms), search is triggered
     await act(async () => {
       vi.advanceTimersByTime(1)
     })

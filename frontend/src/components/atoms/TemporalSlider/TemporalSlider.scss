@@ -80,7 +80,10 @@
       border: 2px solid rgba(255, 255, 255, 0.2);
       margin-top: -7px;
       box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
-      transition: transform 0.15s ease, opacity 0.2s ease, box-shadow 0.15s ease;
+      transition:
+        transform 0.15s ease,
+        opacity 0.2s ease,
+        box-shadow 0.15s ease;
       cursor: pointer;
     }
 
@@ -101,7 +104,10 @@
       background: #d4af37;
       border: 2px solid rgba(255, 255, 255, 0.2);
       box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
-      transition: transform 0.15s ease, opacity 0.2s ease, box-shadow 0.15s ease;
+      transition:
+        transform 0.15s ease,
+        opacity 0.2s ease,
+        box-shadow 0.15s ease;
       cursor: pointer;
     }
 

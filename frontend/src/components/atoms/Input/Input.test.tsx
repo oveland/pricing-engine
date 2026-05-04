@@ -34,15 +34,13 @@ describe('Input', () => {
   })
 
   it('renders with correct input type', () => {
-    render(
-      <Input id="date" label="Fecha" type="datetime-local" value="" onChange={() => {}} />
-    )
+    render(<Input id="date" label="Fecha" type="datetime-local" value="" onChange={() => {}} />)
     expect(screen.getByLabelText('Fecha')).toHaveAttribute('type', 'datetime-local')
   })
 
   it('applies required attribute when specified', () => {
     render(
-      <Input id="test" label="Required Field" type="text" value="" onChange={() => {}} required />
+      <Input id="test" label="Required Field" type="text" value="" onChange={() => {}} required />,
     )
     expect(screen.getByLabelText('Required Field')).toBeRequired()
   })

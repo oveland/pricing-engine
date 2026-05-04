@@ -16,7 +16,7 @@ export function PriceResult(props: PriceResponse) {
       gsap.fromTo(
         containerRef.current,
         { opacity: 0, y: 20, scale: 0.95 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'power2.out' }
+        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'power2.out' },
       )
     })
   }, [contextRef, containerRef])

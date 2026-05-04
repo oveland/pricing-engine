@@ -25,7 +25,7 @@ export function LoadingSpinner({ label = 'Cargando' }: LoadingSpinnerProps) {
         })
       })
     }
-  }, [contextRef.current])
+  }, [contextRef, containerRef])
 
   return (
     <div ref={containerRef} className="loading-spinner" role="status">

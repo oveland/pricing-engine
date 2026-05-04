@@ -105,16 +105,14 @@ describe('PriceSearchPage', () => {
     expect(document.documentElement.classList.contains('dark')).toBe(true)
   })
 
-  /* ── Req 8.1: ZARA brand with editorial typography ── */
-  it('shows "ZARA" with editorial typography (wide letter-spacing, light font-weight)', () => {
+  /* ── Req 8.1: Brand name with editorial typography ── */
+  it('shows "MOTOR DE PRECIOS" with editorial typography (wide letter-spacing, light font-weight)', () => {
     const { container } = render(<PriceSearchPage />)
-    const brandName = screen.getByText('ZARA')
+    const brandName = screen.getByText('MOTOR DE PRECIOS')
     expect(brandName).toBeInTheDocument()
     expect(brandName.tagName).toBe('H1')
     expect(brandName.classList.contains('price-search-page__brand-name')).toBe(true)
 
-    /* Verify the SCSS class is applied — the actual styles are defined in SCSS:
-       font-weight: 300, letter-spacing: 0.35em, text-transform: uppercase */
     const header = container.querySelector('.price-search-page__header')
     expect(header).toBeTruthy()
     expect(header!.tagName).toBe('HEADER')
@@ -132,12 +130,12 @@ describe('PriceSearchPage', () => {
     expect(content!.classList.contains('space-y-12')).toBe(true)
   })
 
-  /* ── Req 8.5: ProductImagePlaceholder with portrait proportion ── */
-  it('renders ProductImagePlaceholder with portrait proportion', () => {
+  /* ── Req 8.5: Page structure includes footer ── */
+  it('renders footer with architecture description', () => {
     const { container } = render(<PriceSearchPage />)
-    const placeholder = container.querySelector('.product-image-placeholder')
-    expect(placeholder).toBeTruthy()
-    expect(placeholder!.getAttribute('style')).toContain('aspect-ratio: 3 / 4')
+    const footer = container.querySelector('.price-search-page__footer')
+    expect(footer).toBeTruthy()
+    expect(footer!.tagName).toBe('FOOTER')
   })
 
   /* ── Req 8.7: Tagline ── */

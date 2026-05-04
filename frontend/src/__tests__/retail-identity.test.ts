@@ -74,9 +74,7 @@ describe('Retail Visual Identity — Tailwind config & CSS', () => {
       // All custom colors should be under the "dark" namespace
       expect(colorKeys).toContain('dark')
       // No bright/saturated color namespaces that would break the retail aesthetic
-      const nonRetailColors = colorKeys.filter(
-        (key) => !['dark'].includes(key),
-      )
+      const nonRetailColors = colorKeys.filter((key) => !['dark'].includes(key))
       expect(nonRetailColors).toEqual([])
     })
 

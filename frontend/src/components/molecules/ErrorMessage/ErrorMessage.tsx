@@ -30,7 +30,7 @@ export function ErrorMessage({ title, message }: ErrorMessageProps) {
             { x: 4, duration: 0.07 },
             { x: 0, duration: 0.07 },
           ],
-        }
+        },
       )
     })
   }, [contextRef, containerRef])
