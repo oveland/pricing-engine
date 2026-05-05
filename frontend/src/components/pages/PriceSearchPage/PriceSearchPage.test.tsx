@@ -139,9 +139,9 @@ describe('PriceSearchPage', () => {
   })
 
   /* ── Req 8.7: Tagline ── */
-  it('shows tagline "Colección Primavera/Verano 2020 — Consulta de precios"', () => {
+  it('shows tagline "Colección Primavera/Verano 2020 — Consulta de tarifas"', () => {
     render(<PriceSearchPage />)
-    const tagline = screen.getByText('Colección Primavera/Verano 2020 — Consulta de precios')
+    const tagline = screen.getByText('Colección Primavera/Verano 2020 — Consulta de tarifas')
     expect(tagline).toBeInTheDocument()
     expect(tagline.classList.contains('price-search-page__tagline')).toBe(true)
   })
