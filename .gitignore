@@ -46,6 +46,12 @@ Thumbs.db
 # ========================
 docker-compose.override.yml
 
+# ========================
+# Docs
+# ========================
+docs/*.drawio
+docs/*.bkp
+docs/*.dtmp
 
 backend/.jqwik-database
 .k*
