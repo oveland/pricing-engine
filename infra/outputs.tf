@@ -22,3 +22,11 @@ output "vpc_id" {
 output "configure_kubectl" {
   value = "aws eks update-kubeconfig --region ${var.region} --name ${module.eks.cluster_name}"
 }
+
+output "ecr_backend_url" {
+  value = aws_ecr_repository.backend.repository_url
+}
+
+output "ecr_frontend_url" {
+  value = aws_ecr_repository.frontend.repository_url
+}
