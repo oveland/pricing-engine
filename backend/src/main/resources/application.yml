@@ -27,3 +27,20 @@ spring:
 
 server:
   port: 8080
+
+# Actuator — Health checks para Kubernetes (liveness/readiness probes)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true  # Habilita /actuator/health/liveness y /actuator/health/readiness
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
