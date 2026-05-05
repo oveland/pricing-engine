@@ -3,8 +3,8 @@
 [![Backend CI](https://github.com/oveland/pricing-engine/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/oveland/pricing-engine/actions/workflows/backend-ci.yml)
 [![Frontend CI](https://github.com/oveland/pricing-engine/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/oveland/pricing-engine/actions/workflows/frontend-ci.yml)
 [![Infrastructure](https://github.com/oveland/pricing-engine/actions/workflows/infra.yml/badge.svg)](https://github.com/oveland/pricing-engine/actions/workflows/infra.yml)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=pricing-engine-backend&metric=alert_status)](https://sonarcloud.io/summary/overall?id=pricing-engine-backend)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=pricing-engine-backend&metric=coverage)](https://sonarcloud.io/summary/overall?id=pricing-engine-backend)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=pricing-engine-backend&metric=alert_status&organization=oveland)](https://sonarcloud.io/summary/overall?id=pricing-engine-backend)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=pricing-engine-backend&metric=coverage&organization=oveland)](https://sonarcloud.io/summary/overall?id=pricing-engine-backend)
 
 API REST que determina el precio aplicable de un producto para una marca en una fecha dada. Cuando múltiples tarifas se solapan en rangos de fechas, prevalece la de mayor prioridad.
 
