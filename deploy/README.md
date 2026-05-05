@@ -1,6 +1,10 @@
-# Kubernetes Deployment — Pricing Service
+# Kubernetes Deployment
 
-## Structure
+Aquí se encuentran los manifiestos que definen cómo corre la aplicación en el cluster EKS.
+
+El despliegue es completamente automático: cada push a `main` dispara el pipeline de CI/CD correspondiente (backend o frontend), que después de pasar las validaciones de calidad, construye la imagen Docker, la sube a ECR y actualiza el cluster.
+
+## Estructura
 
 ```
 deploy/
@@ -11,27 +15,21 @@ deploy/
 └── ingress.yaml
 ```
 
-## Prerequisites
-
-- Kubernetes cluster (EKS, GKE, AKS, or local)
-- `kubectl` configured
-- Docker images published to a registry
-- NGINX Ingress Controller installed
-
-## Deploy
+## Deploy manual (si es necesario)
 
 ```bash
+aws eks update-kubeconfig --region us-east-1 --name pricing-cluster
 kubectl apply -f deploy/
 ```
 
-## Verify
+## Verificar estado
 
 ```bash
-kubectl get all -n pricing
+kubectl get pods -n pricing
 kubectl get ingress -n pricing
 ```
 
-## Scale
+## Escalar
 
 ```bash
 kubectl scale deployment backend -n pricing --replicas=3
