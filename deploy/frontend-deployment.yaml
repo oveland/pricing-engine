@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/component: web
     app.kubernetes.io/part-of: pricing
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: frontend
