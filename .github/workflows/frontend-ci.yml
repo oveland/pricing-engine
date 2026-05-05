@@ -160,5 +160,6 @@ jobs:
           kubectl apply -f deploy/namespace.yaml
           kubectl apply -f deploy/frontend-configmap.yaml
           kubectl apply -f deploy/frontend-deployment.yaml
+          kubectl apply -f deploy/ingress.yaml
           kubectl set image deployment/frontend frontend=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.meta.outputs.version }} -n pricing
           kubectl rollout status deployment/frontend -n pricing --timeout=120s

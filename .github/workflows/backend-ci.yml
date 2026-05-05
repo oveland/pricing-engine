@@ -253,5 +253,6 @@ jobs:
           aws eks update-kubeconfig --region us-east-1 --name pricing-cluster
           kubectl apply -f deploy/namespace.yaml
           kubectl apply -f deploy/backend-deployment.yaml
+          kubectl apply -f deploy/ingress.yaml
           kubectl set image deployment/backend backend=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.meta.outputs.version }} -n pricing
           kubectl rollout status deployment/backend -n pricing --timeout=120s
