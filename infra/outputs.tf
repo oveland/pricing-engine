@@ -30,3 +30,11 @@ output "ecr_backend_url" {
 output "ecr_frontend_url" {
   value = aws_ecr_repository.frontend.repository_url
 }
+
+output "cloudfront_url" {
+  value = "https://${aws_cloudfront_distribution.main.domain_name}"
+}
+
+output "cloudfront_distribution_id" {
+  value = aws_cloudfront_distribution.main.id
+}
