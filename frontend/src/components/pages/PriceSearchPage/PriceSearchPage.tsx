@@ -83,7 +83,7 @@ export function PriceSearchPage() {
 
         {/* Footer */}
         <footer data-animate className="price-search-page__footer text-center">
-          <p>Pricing Service — Arquitectura Hexagonal · Spring Boot · React · TypeScript</p>
+          <p>Pricing Engine — Arquitectura Hexagonal · Spring Boot · React · TypeScript</p>
         </footer>
       </div>
     </div>
