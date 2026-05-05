@@ -45,7 +45,7 @@ export function PriceSearchPage() {
         <header data-animate className="price-search-page__header text-center">
           <h1 className="price-search-page__brand-name">MOTOR DE PRECIOS</h1>
           <p className="price-search-page__tagline">
-            Colección Primavera/Verano 2020 — Consulta de precios
+            Colección Primavera/Verano 2020 — Consulta de tarifas
           </p>
         </header>
 

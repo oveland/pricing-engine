@@ -30,7 +30,7 @@ public class PriceController {
             @RequestParam final Long brandId) {
         log.info("Price lookup: date={}, productId={}, brandId={}", date, productId, brandId);
         final Price price = priceUseCase.findApplicablePrice(date, new ProductId(productId), new BrandId(brandId));
-        log.info("Price found: priceList={}, amount={}", price.getPriceList(), price.getMoney());
+        log.info("Price resolved: priceList={}, amount={}, priority applied", price.getPriceList(), price.getMoney());
 
         return ResponseEntity.ok(priceMapper.toResponseDto(price));
     }

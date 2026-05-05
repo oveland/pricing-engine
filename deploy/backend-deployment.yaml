@@ -21,6 +21,7 @@ spec:
       containers:
         - name: backend
           image: 262270939214.dkr.ecr.us-east-1.amazonaws.com/pricing-engine-backend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
               protocol: TCP
