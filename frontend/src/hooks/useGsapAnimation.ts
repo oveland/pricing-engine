@@ -22,7 +22,7 @@ export function useGsapAnimation(options?: UseGsapAnimationOptions) {
 
   useLayoutEffect(() => {
     if (options?.respectReducedMotion) {
-      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+      const mediaQuery = globalThis.matchMedia('(prefers-reduced-motion: reduce)')
       if (mediaQuery.matches) return
     }
 

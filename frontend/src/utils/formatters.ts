@@ -2,7 +2,7 @@ import type { PriceTagParts } from '../types/price.types'
 
 export function formatDateTime(isoString: string): string {
   const date = new Date(isoString)
-  if (isNaN(date.getTime())) return isoString
+  if (Number.isNaN(date.getTime())) return isoString
   return date.toLocaleString('es-ES', {
     year: 'numeric',
     month: '2-digit',

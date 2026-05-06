@@ -2,7 +2,7 @@
   @apply p-6 rounded-2xl;
   display: contents;
 
-  @screen sm {
+  @media (min-width: 640px) {
     display: block;
   }
 
