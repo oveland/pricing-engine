@@ -139,30 +139,33 @@ jobs:
       - name: Login to ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Docker Meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}
-          tags: |
-            type=sha,prefix=
-            type=raw,value=latest
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./frontend/package.json').version")
+          SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          TAG="${VERSION}-${SHA}"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "Image tag: ${TAG}"
 
       - uses: docker/build-push-action@v6
         with:
           context: ./frontend
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.tag }}
+            ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
       - name: Deploy to EKS
         run: |
           aws eks update-kubeconfig --region us-east-1 --name pricing-cluster
+          IMAGE="${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.tag }}"
+          sed -i "s|image: .*pricing-engine-frontend.*|image: ${IMAGE}|" deploy/frontend-deployment.yaml
           kubectl apply -f deploy/namespace.yaml
           kubectl apply -f deploy/frontend-configmap.yaml
           kubectl apply -f deploy/frontend-deployment.yaml
           kubectl apply -f deploy/ingress.yaml
-          kubectl set image deployment/frontend frontend=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.meta.outputs.version }} -n pricing
-          kubectl rollout status deployment/frontend -n pricing --timeout=120s
+          kubectl rollout status deployment/frontend -n pricing --timeout=180s
 
       - name: Invalidate CloudFront cache
         run: |
