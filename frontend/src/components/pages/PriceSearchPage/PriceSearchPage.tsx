@@ -67,7 +67,7 @@ export function PriceSearchPage() {
         </div>
 
         {/* Zona de resultados con aria-live para accesibilidad */}
-        <div aria-live="polite">
+        <div aria-live="polite" className="price-search-page__result">
           {state.kind === 'loading' && <LoadingSpinner />}
           {state.kind === 'success' && <PriceResult {...state.data} />}
           {state.kind === 'error' && (

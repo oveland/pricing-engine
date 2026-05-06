@@ -18,6 +18,8 @@ spec:
       labels:
         app: frontend
     spec:
+      nodeSelector:
+        type: on-demand
       containers:
         - name: frontend
           image: 262270939214.dkr.ecr.us-east-1.amazonaws.com/pricing-engine-frontend:latest
