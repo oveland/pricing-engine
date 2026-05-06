@@ -16,16 +16,18 @@ export function Input({ id, label, type, value, onChange, required, min }: Input
       <label htmlFor={id} className="input__label">
         {label}
       </label>
-      <input
-        type={type}
-        id={id}
-        name={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        required={required}
-        min={min}
-        className="input__field"
-      />
+      <div className="input__wrapper">
+        <input
+          type={type}
+          id={id}
+          name={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          required={required}
+          min={min}
+          className="input__field"
+        />
+      </div>
     </div>
   )
 }

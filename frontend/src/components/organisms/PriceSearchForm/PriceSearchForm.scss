@@ -1,5 +1,10 @@
 .price-search-form {
   @apply p-6 rounded-2xl;
+  display: contents;
+
+  @screen sm {
+    display: block;
+  }
 
   &__title {
     @apply text-lg font-semibold text-dark-text-primary mb-4;

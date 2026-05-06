@@ -16,8 +16,10 @@ interface PriceSearchFormProps {
   onSubmit: () => void
   /** Valor del slider temporal como timestamp */
   sliderValue: number
-  /** Callback al cambiar el slider */
+  /** Callback al cambiar el slider (preview mientras arrastra) */
   onSliderChange: (timestamp: number) => void
+  /** Callback al soltar el slider (dispara consulta) */
+  onSliderChangeEnd: (timestamp: number) => void
   /** Marcadores de transición de precios */
   sliderMarkers: SliderMarker[]
 }
@@ -33,6 +35,7 @@ export function PriceSearchForm({
   onSubmit,
   sliderValue,
   onSliderChange,
+  onSliderChangeEnd,
   sliderMarkers,
 }: PriceSearchFormProps) {
   function handleSubmit(e: FormEvent) {
@@ -79,6 +82,7 @@ export function PriceSearchForm({
         <TemporalSlider
           value={sliderValue}
           onChange={onSliderChange}
+          onChangeEnd={onSliderChangeEnd}
           markers={sliderMarkers}
           disabled={loading}
         />

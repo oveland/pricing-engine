@@ -11,8 +11,10 @@ import type { SliderMarker } from '../../../types/price.types'
 export interface TemporalSliderProps {
   /** Valor actual como timestamp en milisegundos */
   value: number
-  /** Callback al cambiar el valor del slider */
+  /** Callback al cambiar el valor del slider (mientras se arrastra) */
   onChange: (timestamp: number) => void
+  /** Callback al soltar el slider (fin del arrastre) */
+  onChangeEnd: (timestamp: number) => void
   /** Marcadores de transición de precios */
   markers: SliderMarker[]
   /** Si el slider está deshabilitado (durante carga) */
@@ -22,6 +24,7 @@ export interface TemporalSliderProps {
 export function TemporalSlider({
   value,
   onChange,
+  onChangeEnd,
   markers,
   disabled = false,
 }: TemporalSliderProps) {
@@ -31,9 +34,6 @@ export function TemporalSlider({
     <div className="temporal-slider">
       <div className="temporal-slider__header">
         <span className="temporal-slider__label">Explorar precios por fecha</span>
-        <span className="temporal-slider__date" aria-live="polite">
-          {readableDate}
-        </span>
       </div>
 
       <div className="temporal-slider__track-container">
@@ -46,6 +46,8 @@ export function TemporalSlider({
           value={value}
           disabled={disabled}
           onChange={(e) => onChange(Number(e.target.value))}
+          onMouseUp={(e) => onChangeEnd(Number((e.target as HTMLInputElement).value))}
+          onTouchEnd={(e) => onChangeEnd(Number((e.target as HTMLInputElement).value))}
           aria-label="Selector de fecha temporal"
           aria-valuetext={readableDate}
           aria-valuemin={SLIDER_MIN_TIMESTAMP}

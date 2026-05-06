@@ -175,11 +175,11 @@ describe('Accessibility — cross-cutting tests', () => {
       expect(slider!.getAttribute('aria-valuemax')).toBeTruthy()
     })
 
-    it('TemporalSlider date display has aria-live="polite"', () => {
+    it('TemporalSlider slider has aria-valuetext for screen readers', () => {
       const { container } = render(<PriceSearchPage />)
-      const dateDisplay = container.querySelector('.temporal-slider__date')
-      expect(dateDisplay).toBeTruthy()
-      expect(dateDisplay!.getAttribute('aria-live')).toBe('polite')
+      const slider = container.querySelector('.temporal-slider__input')
+      expect(slider).toBeTruthy()
+      expect(slider!.getAttribute('aria-valuetext')).toBeTruthy()
     })
   })
 

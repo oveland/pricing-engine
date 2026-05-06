@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import type { QueryState, SliderMarker } from '../types/price.types'
 import { fetchApplicablePrice } from '../services/price.service'
-import { useDebounce } from './useDebounce'
 import {
   SLIDER_MIN_TIMESTAMP,
   PRICE_TRANSITION_MARKERS,
@@ -18,33 +17,22 @@ export function usePriceSearch() {
   const [state, setState] = useState<QueryState>({ kind: 'idle' })
   const [sliderValue, setSliderValue] = useState(SLIDER_MIN_TIMESTAMP)
 
-  const debouncedSliderValue = useDebounce(sliderValue, 200)
-  const isInitialMount = useRef(true)
-  const shouldAutoSearch = useRef(false)
+  /** Actualiza el preview de fecha mientras se arrastra el slider (sin consulta) */
+  const handleSliderChange = useCallback((timestamp: number) => {
+    setSliderValue(timestamp)
+    setDate(timestampToDateTimeLocal(timestamp) + ':00')
+  }, [])
 
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false
-      return
-    }
+  /** Al soltar el slider, dispara la consulta al backend */
+  const handleSliderChangeEnd = useCallback(
+    async (timestamp: number) => {
+      const newDate = timestampToDateTimeLocal(timestamp) + ':00'
+      setDate(newDate)
 
-    shouldAutoSearch.current = true
-    setDate(timestampToDateTimeLocal(debouncedSliderValue) + ':00')
-  }, [debouncedSliderValue])
-
-  useEffect(() => {
-    if (!shouldAutoSearch.current) return
-    shouldAutoSearch.current = false
-
-    let cancelled = false
-
-    async function fetchPrice() {
       setState({ kind: 'loading' })
 
       try {
-        const result = await fetchApplicablePrice({ date, productId, brandId })
-
-        if (cancelled) return
+        const result = await fetchApplicablePrice({ date: newDate, productId, brandId })
 
         if (result.ok) {
           setState({ kind: 'success', data: result.data })
@@ -52,18 +40,11 @@ export function usePriceSearch() {
           setState({ kind: 'error', error: result.error })
         }
       } catch {
-        if (!cancelled) {
-          setState({ kind: 'network-error', message: NETWORK_ERROR_MESSAGE })
-        }
+        setState({ kind: 'network-error', message: NETWORK_ERROR_MESSAGE })
       }
-    }
-
-    fetchPrice()
-
-    return () => {
-      cancelled = true
-    }
-  }, [date, productId, brandId])
+    },
+    [productId, brandId],
+  )
 
   const search = useCallback(async () => {
     setState({ kind: 'loading' })
@@ -93,7 +74,8 @@ export function usePriceSearch() {
     setBrandId,
     search,
     sliderValue,
-    setSliderValue,
+    handleSliderChange,
+    handleSliderChangeEnd,
     sliderMarkers,
   }
 }

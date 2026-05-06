@@ -19,7 +19,8 @@ export function PriceSearchPage() {
     setBrandId,
     search,
     sliderValue,
-    setSliderValue,
+    handleSliderChange,
+    handleSliderChangeEnd,
     sliderMarkers,
   } = usePriceSearch()
 
@@ -61,7 +62,8 @@ export function PriceSearchPage() {
             onBrandIdChange={setBrandId}
             onSubmit={search}
             sliderValue={sliderValue}
-            onSliderChange={setSliderValue}
+            onSliderChange={handleSliderChange}
+            onSliderChangeEnd={handleSliderChangeEnd}
             sliderMarkers={sliderMarkers}
           />
         </div>

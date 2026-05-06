@@ -12,6 +12,7 @@ import { formatSliderDate } from '../../../../utils/formatters'
 const defaultProps = {
   value: SLIDER_MIN_TIMESTAMP,
   onChange: vi.fn(),
+  onChangeEnd: vi.fn(),
   markers: PRICE_TRANSITION_MARKERS,
 }
 
@@ -30,10 +31,11 @@ describe('TemporalSlider', () => {
     const midTimestamp = Math.floor((SLIDER_MIN_TIMESTAMP + SLIDER_MAX_TIMESTAMP) / 2)
 
     const { rerender } = render(<TemporalSlider {...defaultProps} value={SLIDER_MIN_TIMESTAMP} />)
-    expect(screen.getByText(formatSliderDate(SLIDER_MIN_TIMESTAMP))).toBeInTheDocument()
+    const slider = screen.getByRole('slider')
+    expect(slider).toHaveAttribute('aria-valuetext', formatSliderDate(SLIDER_MIN_TIMESTAMP))
 
     rerender(<TemporalSlider {...defaultProps} value={midTimestamp} />)
-    expect(screen.getByText(formatSliderDate(midTimestamp))).toBeInTheDocument()
+    expect(slider).toHaveAttribute('aria-valuetext', formatSliderDate(midTimestamp))
   })
 
   it('includes all required ARIA attributes', () => {
