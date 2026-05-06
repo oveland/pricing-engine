@@ -94,4 +94,24 @@ describe('TemporalSlider', () => {
     const slider = screen.getByRole('slider')
     expect(slider).toBeDisabled()
   })
+
+  it('calls onChangeEnd on mouseUp', () => {
+    const onChangeEnd = vi.fn()
+    const value = SLIDER_MIN_TIMESTAMP + 60000 * 30
+    render(<TemporalSlider {...defaultProps} value={value} onChangeEnd={onChangeEnd} />)
+
+    const slider = screen.getByRole('slider')
+    fireEvent.mouseUp(slider)
+    expect(onChangeEnd).toHaveBeenCalledWith(value)
+  })
+
+  it('calls onChangeEnd on touchEnd', () => {
+    const onChangeEnd = vi.fn()
+    const value = SLIDER_MIN_TIMESTAMP + 60000 * 60
+    render(<TemporalSlider {...defaultProps} value={value} onChangeEnd={onChangeEnd} />)
+
+    const slider = screen.getByRole('slider')
+    fireEvent.touchEnd(slider)
+    expect(onChangeEnd).toHaveBeenCalledWith(value)
+  })
 })

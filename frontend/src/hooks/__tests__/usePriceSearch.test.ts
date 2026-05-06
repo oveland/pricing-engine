@@ -84,4 +84,77 @@ describe('usePriceSearch — slider integration', () => {
 
     expect(mockFetch).not.toHaveBeenCalled()
   })
+
+  it('search() muestra network-error cuando fetch lanza excepción', async () => {
+    mockFetch.mockRejectedValue(new Error('Network failure'))
+
+    const { result } = renderHook(() => usePriceSearch())
+
+    await act(async () => {
+      await result.current.search()
+    })
+
+    expect(result.current.state.kind).toBe('network-error')
+    if (result.current.state.kind === 'network-error') {
+      expect(result.current.state.message).toContain('No se pudo conectar')
+    }
+  })
+
+  it('search() muestra error cuando respuesta no es ok', async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 400,
+        error: 'Bad Request',
+        message: 'Invalid parameters',
+        timestamp: '2020-06-14T10:00:00',
+      },
+    })
+
+    const { result } = renderHook(() => usePriceSearch())
+
+    await act(async () => {
+      await result.current.search()
+    })
+
+    expect(result.current.state.kind).toBe('error')
+    if (result.current.state.kind === 'error') {
+      expect(result.current.state.error.message).toBe('Invalid parameters')
+    }
+  })
+
+  it('search() muestra success cuando respuesta es ok', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      data: {
+        productId: 35455,
+        brandId: 1,
+        priceList: 1,
+        startDate: '2020-06-14T00:00:00',
+        endDate: '2020-12-31T23:59:59',
+        price: 35.5,
+        currency: 'EUR',
+      },
+    })
+
+    const { result } = renderHook(() => usePriceSearch())
+
+    await act(async () => {
+      await result.current.search()
+    })
+
+    expect(result.current.state.kind).toBe('success')
+  })
+
+  it('handleSliderChangeEnd muestra network-error cuando fetch lanza excepción', async () => {
+    mockFetch.mockRejectedValue(new Error('Network failure'))
+
+    const { result } = renderHook(() => usePriceSearch())
+
+    await act(async () => {
+      await result.current.handleSliderChangeEnd(SLIDER_MIN_TIMESTAMP + 3_600_000)
+    })
+
+    expect(result.current.state.kind).toBe('network-error')
+  })
 })

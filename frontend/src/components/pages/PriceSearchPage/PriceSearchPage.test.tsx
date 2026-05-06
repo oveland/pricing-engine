@@ -155,4 +155,63 @@ describe('PriceSearchPage', () => {
     expect(content!.classList.contains('max-w-2xl')).toBe(true)
     expect(content!.classList.contains('mx-auto')).toBe(true)
   })
+
+  /* ── Result states coverage ── */
+  it('shows PriceResult on successful search', async () => {
+    render(<PriceSearchPage />)
+    await userEvent.click(screen.getByRole('button', { name: /consultar precio/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText('ZARA')).toBeInTheDocument()
+    })
+  })
+
+  it('shows error message when API returns 404', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValue({
+      ok: false,
+      json: async () => ({
+        status: 404,
+        error: 'Not Found',
+        message: 'No applicable price found',
+        timestamp: '2020-06-14T10:00:00',
+      }),
+    } as Response)
+
+    render(<PriceSearchPage />)
+    await userEvent.click(screen.getByRole('button', { name: /consultar precio/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText(/precio no encontrado/i)).toBeInTheDocument()
+    })
+  })
+
+  it('shows error message when API returns 400', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValue({
+      ok: false,
+      json: async () => ({
+        status: 400,
+        error: 'Bad Request',
+        message: 'Invalid parameters',
+        timestamp: '2020-06-14T10:00:00',
+      }),
+    } as Response)
+
+    render(<PriceSearchPage />)
+    await userEvent.click(screen.getByRole('button', { name: /consultar precio/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText(/parámetros inválidos/i)).toBeInTheDocument()
+    })
+  })
+
+  it('shows network error when fetch throws', async () => {
+    vi.spyOn(global, 'fetch').mockRejectedValue(new Error('Network failure'))
+
+    render(<PriceSearchPage />)
+    await userEvent.click(screen.getByRole('button', { name: /consultar precio/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText(/error de conexión/i)).toBeInTheDocument()
+    })
+  })
 })
