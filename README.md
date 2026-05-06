@@ -3,10 +3,11 @@
 [![Backend CI](https://github.com/oveland/pricing-engine/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/oveland/pricing-engine/actions/workflows/backend-ci.yml)
 [![Frontend CI](https://github.com/oveland/pricing-engine/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/oveland/pricing-engine/actions/workflows/frontend-ci.yml)
 [![Infrastructure](https://github.com/oveland/pricing-engine/actions/workflows/infra.yml/badge.svg)](https://github.com/oveland/pricing-engine/actions/workflows/infra.yml)
-[![Quality Gate Backend](https://sonarcloud.io/api/project_badges/measure?project=pricing-engine-backend&metric=alert_status&organization=oveland)](https://sonarcloud.io/summary/overall?id=pricing-engine-backend)
-[![Coverage Backend](https://sonarcloud.io/api/project_badges/measure?project=pricing-engine-backend&metric=coverage&organization=oveland)](https://sonarcloud.io/summary/overall?id=pricing-engine-backend)
-[![Quality Gate Frontend](https://sonarcloud.io/api/project_badges/measure?project=pricing-engine-frontend&metric=alert_status&organization=oveland)](https://sonarcloud.io/summary/overall?id=pricing-engine-frontend)
-[![Coverage Frontend](https://sonarcloud.io/api/project_badges/measure?project=pricing-engine-frontend&metric=coverage&organization=oveland)](https://sonarcloud.io/summary/overall?id=pricing-engine-frontend)
+
+| | Quality Gate | Coverage |
+|---|---|---|
+| **Backend** | [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=pricing-engine-backend&metric=alert_status&organization=oveland)](https://sonarcloud.io/summary/overall?id=pricing-engine-backend) | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=pricing-engine-backend&metric=coverage&organization=oveland)](https://sonarcloud.io/summary/overall?id=pricing-engine-backend) |
+| **Frontend** | [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=pricing-engine-frontend&metric=alert_status&organization=oveland)](https://sonarcloud.io/summary/overall?id=pricing-engine-frontend) | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=pricing-engine-frontend&metric=coverage&organization=oveland)](https://sonarcloud.io/summary/overall?id=pricing-engine-frontend) |
 
 API REST que determina el precio aplicable de un producto para una marca en una fecha dada. Cuando múltiples tarifas se solapan en rangos de fechas, prevalece la de mayor prioridad.
 
