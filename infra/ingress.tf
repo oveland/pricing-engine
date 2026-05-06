@@ -9,6 +9,8 @@ resource "helm_release" "nginx_ingress" {
   values = [
     <<-EOT
     controller:
+      nodeSelector:
+        type: on-demand
       service:
         type: LoadBalancer
         annotations:
