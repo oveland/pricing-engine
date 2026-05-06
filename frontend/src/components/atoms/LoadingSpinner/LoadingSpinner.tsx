@@ -28,13 +28,9 @@ export function LoadingSpinner({ label = 'Cargando' }: LoadingSpinnerProps) {
   }, [contextRef, containerRef])
 
   return (
-    <output
-      ref={containerRef as React.RefObject<HTMLOutputElement>}
-      className="loading-spinner"
-      role="status"
-    >
+    <div ref={containerRef} className="loading-spinner" role="status">
       <div className="loading-spinner__circle" aria-hidden="true" />
       <span className="sr-only">{label}</span>
-    </output>
+    </div>
   )
 }
