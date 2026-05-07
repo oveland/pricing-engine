@@ -11,6 +11,7 @@ import com.pricing.infrastructure.mapper.PriceMapper;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -85,6 +86,57 @@ class JpaPriceAdapterIntegrationTest {
             List<Price> prices = jpaPriceAdapter.findByBrandIdAndProductIdAndDate(BRAND_ZARA, PRODUCT_35455, date);
 
             assertThat(prices).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("Optimized query — findHighestPriorityPrice")
+    class OptimizedQuery {
+        @Test
+        @DisplayName("2020-06-14T10:00 → price list 1 (only candidate, priority 0)")
+        void shouldReturnSingleCandidateAt10OnJune14() {
+            LocalDateTime date = LocalDateTime.of(2020, 6, 14, 10, 0);
+
+            Optional<Price> result = jpaPriceAdapter.findHighestPriorityPrice(BRAND_ZARA, PRODUCT_35455, date);
+
+            assertThat(result).isPresent();
+            assertThat(result.get().getPriceList()).isEqualTo(1);
+            assertThat(result.get().getPriority()).isZero();
+        }
+
+        @Test
+        @DisplayName("2020-06-14T16:00 → price list 2 (highest priority among overlapping)")
+        void shouldReturnHighestPriorityAt16OnJune14() {
+            LocalDateTime date = LocalDateTime.of(2020, 6, 14, 16, 0);
+
+            Optional<Price> result = jpaPriceAdapter.findHighestPriorityPrice(BRAND_ZARA, PRODUCT_35455, date);
+
+            assertThat(result).isPresent();
+            assertThat(result.get().getPriceList()).isEqualTo(2);
+            assertThat(result.get().getPriority()).isEqualTo(1);
+            assertThat(result.get().getMoney().amount()).isEqualByComparingTo(new BigDecimal("25.45"));
+        }
+
+        @Test
+        @DisplayName("2020-06-15T10:00 → price list 3 (highest priority among overlapping)")
+        void shouldReturnHighestPriorityAt10OnJune15() {
+            LocalDateTime date = LocalDateTime.of(2020, 6, 15, 10, 0);
+
+            Optional<Price> result = jpaPriceAdapter.findHighestPriorityPrice(BRAND_ZARA, PRODUCT_35455, date);
+
+            assertThat(result).isPresent();
+            assertThat(result.get().getPriceList()).isEqualTo(3);
+            assertThat(result.get().getPriority()).isEqualTo(1);
+        }
+
+        @Test
+        @DisplayName("date with no matches → empty Optional")
+        void shouldReturnEmptyWhenNoMatches() {
+            LocalDateTime date = LocalDateTime.of(2019, 1, 1, 0, 0);
+
+            Optional<Price> result = jpaPriceAdapter.findHighestPriorityPrice(BRAND_ZARA, PRODUCT_35455, date);
+
+            assertThat(result).isEmpty();
         }
     }
 
