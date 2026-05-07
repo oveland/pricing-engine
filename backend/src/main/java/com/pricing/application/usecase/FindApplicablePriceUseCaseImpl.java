@@ -7,7 +7,6 @@ import com.pricing.domain.model.ProductId;
 import com.pricing.domain.port.input.FindApplicablePriceUseCase;
 import com.pricing.domain.port.output.PriceRepositoryPort;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class FindApplicablePriceUseCaseImpl implements FindApplicablePriceUseCase {
     private final PriceRepositoryPort priceRepository;
@@ -19,10 +18,8 @@ public class FindApplicablePriceUseCaseImpl implements FindApplicablePriceUseCas
     @Override
     public Price findApplicablePrice(
             final LocalDateTime applicationDate, final ProductId productId, final BrandId brandId) {
-        final List<Price> candidates =
-                priceRepository.findByBrandIdAndProductIdAndDate(brandId, productId, applicationDate);
-
-        return Price.withHighestPriority(candidates)
+        return priceRepository
+                .findHighestPriorityPrice(brandId, productId, applicationDate)
                 .orElseThrow(() -> new PriceNotFoundException(brandId, productId, applicationDate));
     }
 }

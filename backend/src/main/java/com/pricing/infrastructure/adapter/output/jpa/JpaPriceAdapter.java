@@ -7,6 +7,7 @@ import com.pricing.domain.port.output.PriceRepositoryPort;
 import com.pricing.infrastructure.mapper.PriceMapper;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -22,5 +23,13 @@ public class JpaPriceAdapter implements PriceRepositoryPort {
         final List<PriceEntity> entities =
                 jpaRepository.findByBrandIdAndProductIdAndDateBetween(brandId.value(), productId.value(), date);
         return entities.stream().map(priceMapper::toDomain).toList();
+    }
+
+    @Override
+    public Optional<Price> findHighestPriorityPrice(
+            final BrandId brandId, final ProductId productId, final LocalDateTime date) {
+        return jpaRepository
+                .findTopByBrandIdAndProductIdAndDateOrderByPriorityDesc(brandId.value(), productId.value(), date)
+                .map(priceMapper::toDomain);
     }
 }

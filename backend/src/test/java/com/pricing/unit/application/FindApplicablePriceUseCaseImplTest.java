@@ -9,8 +9,7 @@ import com.pricing.domain.model.*;
 import com.pricing.domain.port.output.PriceRepositoryPort;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,28 +37,26 @@ class FindApplicablePriceUseCaseImplTest {
 
     private static final Money PRICE_35_50_EUR = new Money(new BigDecimal("35.50"), "EUR");
     private static final Money PRICE_25_45_EUR = new Money(new BigDecimal("25.45"), "EUR");
-    private static final Money PRICE_38_95_EUR = new Money(new BigDecimal("38.95"), "EUR");
 
     @Test
-    @DisplayName("should return the correct price when repository returns a single candidate")
-    void shouldReturnCorrectPriceWhenSingleCandidate() {
-        Price singlePrice = new Price(BRAND_ZARA, PRODUCT_35455, 1, FULL_RANGE, 0, PRICE_35_50_EUR);
-        when(priceRepository.findByBrandIdAndProductIdAndDate(BRAND_ZARA, PRODUCT_35455, APPLICATION_DATE))
-                .thenReturn(List.of(singlePrice));
+    @DisplayName("should return the price when repository finds the highest priority candidate")
+    void shouldReturnPriceWhenRepositoryFindsCandidate() {
+        Price expectedPrice = new Price(BRAND_ZARA, PRODUCT_35455, 1, FULL_RANGE, 0, PRICE_35_50_EUR);
+        when(priceRepository.findHighestPriorityPrice(BRAND_ZARA, PRODUCT_35455, APPLICATION_DATE))
+                .thenReturn(Optional.of(expectedPrice));
 
         Price result = useCase.findApplicablePrice(APPLICATION_DATE, PRODUCT_35455, BRAND_ZARA);
 
-        assertSame(singlePrice, result);
-        verify(priceRepository).findByBrandIdAndProductIdAndDate(BRAND_ZARA, PRODUCT_35455, APPLICATION_DATE);
+        assertSame(expectedPrice, result);
+        verify(priceRepository).findHighestPriorityPrice(BRAND_ZARA, PRODUCT_35455, APPLICATION_DATE);
     }
 
     @Test
-    @DisplayName("should return the price with highest priority when repository returns multiple candidates")
-    void shouldReturnHighestPriorityPriceWhenMultipleCandidates() {
-        Price lowPriority = new Price(BRAND_ZARA, PRODUCT_35455, 1, FULL_RANGE, 0, PRICE_35_50_EUR);
+    @DisplayName("should return the highest priority price resolved by the database")
+    void shouldReturnHighestPriorityPriceResolvedByDatabase() {
         Price highPriority = new Price(BRAND_ZARA, PRODUCT_35455, 2, SHORT_RANGE, 1, PRICE_25_45_EUR);
-        when(priceRepository.findByBrandIdAndProductIdAndDate(BRAND_ZARA, PRODUCT_35455, APPLICATION_DATE))
-                .thenReturn(List.of(lowPriority, highPriority));
+        when(priceRepository.findHighestPriorityPrice(BRAND_ZARA, PRODUCT_35455, APPLICATION_DATE))
+                .thenReturn(Optional.of(highPriority));
 
         Price result = useCase.findApplicablePrice(APPLICATION_DATE, PRODUCT_35455, BRAND_ZARA);
 
@@ -69,28 +66,10 @@ class FindApplicablePriceUseCaseImplTest {
     }
 
     @Test
-    @DisplayName("should return the price with highest priority among three candidates with distinct priorities")
-    void shouldReturnHighestPriorityAmongThreeCandidates() {
-        Price priority0 = new Price(BRAND_ZARA, PRODUCT_35455, 1, FULL_RANGE, 0, PRICE_35_50_EUR);
-        Price priority1 = new Price(BRAND_ZARA, PRODUCT_35455, 2, SHORT_RANGE, 1, PRICE_25_45_EUR);
-        DateRange anotherRange =
-                new DateRange(LocalDateTime.of(2020, 6, 15, 16, 0, 0), LocalDateTime.of(2020, 12, 31, 23, 59, 59));
-        Price priority2 = new Price(BRAND_ZARA, PRODUCT_35455, 4, anotherRange, 2, PRICE_38_95_EUR);
-        when(priceRepository.findByBrandIdAndProductIdAndDate(BRAND_ZARA, PRODUCT_35455, APPLICATION_DATE))
-                .thenReturn(List.of(priority0, priority1, priority2));
-
-        Price result = useCase.findApplicablePrice(APPLICATION_DATE, PRODUCT_35455, BRAND_ZARA);
-
-        assertEquals(2, result.getPriority());
-        assertEquals(PRICE_38_95_EUR, result.getMoney());
-        assertEquals(4, result.getPriceList());
-    }
-
-    @Test
-    @DisplayName("should throw PriceNotFoundException when repository returns empty list")
+    @DisplayName("should throw PriceNotFoundException when repository returns empty")
     void shouldThrowPriceNotFoundExceptionWhenNoCandidates() {
-        when(priceRepository.findByBrandIdAndProductIdAndDate(BRAND_ZARA, PRODUCT_35455, APPLICATION_DATE))
-                .thenReturn(Collections.emptyList());
+        when(priceRepository.findHighestPriorityPrice(BRAND_ZARA, PRODUCT_35455, APPLICATION_DATE))
+                .thenReturn(Optional.empty());
 
         PriceNotFoundException exception = assertThrows(
                 PriceNotFoundException.class,
@@ -105,12 +84,12 @@ class FindApplicablePriceUseCaseImplTest {
     @DisplayName("should delegate to PriceRepositoryPort with correct parameters")
     void shouldDelegateToRepositoryWithCorrectParameters() {
         Price price = new Price(BRAND_ZARA, PRODUCT_35455, 1, FULL_RANGE, 0, PRICE_35_50_EUR);
-        when(priceRepository.findByBrandIdAndProductIdAndDate(BRAND_ZARA, PRODUCT_35455, APPLICATION_DATE))
-                .thenReturn(List.of(price));
+        when(priceRepository.findHighestPriorityPrice(BRAND_ZARA, PRODUCT_35455, APPLICATION_DATE))
+                .thenReturn(Optional.of(price));
 
         useCase.findApplicablePrice(APPLICATION_DATE, PRODUCT_35455, BRAND_ZARA);
 
-        verify(priceRepository, times(1)).findByBrandIdAndProductIdAndDate(BRAND_ZARA, PRODUCT_35455, APPLICATION_DATE);
+        verify(priceRepository, times(1)).findHighestPriorityPrice(BRAND_ZARA, PRODUCT_35455, APPLICATION_DATE);
         verifyNoMoreInteractions(priceRepository);
     }
 }
